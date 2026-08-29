@@ -8,9 +8,9 @@ tutor in front of you that knows your course material. It runs entirely on
 your own machine.
 
 > **Windows version.** There is a separate, standalone macOS project at
-> [school-agent-mac](https://github.com/dkindlon1/school-agent-mac). The two
-> are independent — neither depends on the other, and neither needs the other
-> to be installed.
+> [`school-agent-mac/`](../school-agent-mac). The two are independent —
+> neither depends on the other, and neither needs the other to be
+> installed. Take this folder on its own and it works.
 
 ## Getting started
 
