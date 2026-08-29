@@ -1,0 +1,22 @@
+# Copy this file to classes.yaml and fill in your actual current course load.
+# classes.yaml is gitignored — it's personal schedule data, not sample data.
+#
+# ics_feed_url: MyCourses (Brightspace/D2L) > Calendar > Settings > Subscribe.
+# This is self-service — no IT/admin approval needed, unlike the full
+# Brightspace API, which is admin-gated. The calendar feed is the one
+# itself isn't the v1 integration path.
+#
+# topics: optional — transcribe from the syllabus as [date, topic] pairs.
+# Powers getahead.py's "what's coming up" summaries. Leave empty and add
+# incrementally; it degrades gracefully to "no topics ingested yet".
+
+classes:
+  - slug: example101
+    name: "EXAMPLE 101 - Intro to Examples"
+    term: "Fall 2026"
+    instructor: "Prof. Example"
+    ics_feed_url: "https://mycourses.example.edu/d2l/le/calendar/feed/user/CHANGE_ME.ics"
+    syllabus_path: "data/example101/materials/syllabus.pdf"
+    topics:
+      - ["2026-09-02", "Course overview"]
+      - ["2026-09-09", "Chapter 1: Foundations"]

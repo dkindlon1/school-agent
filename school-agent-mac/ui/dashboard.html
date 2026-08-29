@@ -1,0 +1,3188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>School Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ tokens ============ */
+  :root {
+    --ink: #221a15;
+    --ink-dim: #6e5f54;
+    --ink-faint: #a08f82;
+    --glass: rgba(255, 255, 255, 0.60);
+    --glass-strong: rgba(255, 255, 255, 0.80);
+    --layer: rgba(255, 255, 255, 0.55);
+    --input-bg: rgba(255, 255, 255, 0.65);
+    --hairline: rgba(80, 45, 28, 0.11);
+    --hairline-strong: rgba(80, 45, 28, 0.22);
+    --accent: #e0512c;
+    --accent2: #d9821f;
+    --accent-text: #c2410c;
+    --accent-soft: rgba(224, 81, 44, 0.12);
+    --danger: #d64553;
+    --danger-soft: rgba(214, 69, 83, 0.12);
+    --warn: #a2731a;
+    --warn-soft: rgba(178, 130, 32, 0.14);
+    --good: #178f60;
+    --good-soft: rgba(31, 160, 106, 0.13);
+    --sb-bg: rgba(255, 255, 255, 0.52);
+    --sb-bg-soft: rgba(255, 255, 255, 0.72);
+    --sb-ink: #221a15;
+    --sb-dim: #6e5f54;
+    --sb-hairline: rgba(80, 45, 28, 0.11);
+    --glow: 0 10px 34px -10px rgba(90, 48, 25, 0.18);
+    --inset: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    --r-xl: 20px;
+    --r-lg: 16px;
+    --r-md: 12px;
+    --r-sm: 9px;
+    --display: "Space Grotesk", "Inter", -apple-system, sans-serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --page-bg: #f6f1ea;
+    --orb1: rgba(235, 150, 55, 0.26);
+    --orb2: rgba(224, 81, 44, 0.20);
+    --orb3: rgba(201, 64, 125, 0.13);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #f2ebe3;
+      --ink-dim: #b3a294;
+      --ink-faint: #7d6c60;
+      --glass: rgba(38, 24, 22, 0.50);
+      --glass-strong: rgba(46, 29, 26, 0.80);
+      --layer: rgba(255, 255, 255, 0.045);
+      --input-bg: rgba(16, 10, 9, 0.45);
+      --hairline: rgba(255, 255, 255, 0.09);
+      --hairline-strong: rgba(255, 255, 255, 0.17);
+      --accent: #ff7a48;
+      --accent2: #ffb75c;
+      --accent-text: #ffa06e;
+      --accent-soft: rgba(255, 122, 72, 0.16);
+      --danger: #ff7b88;
+      --danger-soft: rgba(255, 123, 136, 0.13);
+      --warn: #eebf55;
+      --warn-soft: rgba(238, 191, 85, 0.13);
+      --good: #3ddca2;
+      --good-soft: rgba(61, 220, 162, 0.13);
+      --sb-bg: rgba(26, 16, 15, 0.58);
+      --sb-bg-soft: rgba(255, 255, 255, 0.06);
+      --sb-ink: #f2ebe3;
+      --sb-dim: #a08f82;
+      --sb-hairline: rgba(255, 255, 255, 0.08);
+      --glow: 0 14px 44px -12px rgba(0, 0, 0, 0.55);
+      --inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      --page-bg: #120b0d;
+      --orb1: rgba(255, 183, 92, 0.15);
+      --orb2: rgba(255, 110, 60, 0.17);
+      --orb3: rgba(214, 69, 120, 0.11);
+      color-scheme: dark;
+    }
+  }
+
+  /* ============ base ============ */
+  * { box-sizing: border-box; }
+  html { background: var(--page-bg); }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: transparent; color: var(--ink);
+    font-family: var(--sans); font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before, body::after {
+    content: ""; position: fixed; border-radius: 50%; z-index: -1;
+    filter: blur(90px); pointer-events: none;
+  }
+  body::before {
+    width: 560px; height: 560px; top: -140px; left: -100px;
+    background: radial-gradient(circle, var(--orb1), transparent 65%);
+  }
+  body::after {
+    width: 680px; height: 680px; bottom: -220px; right: -160px;
+    background: radial-gradient(circle, var(--orb2), transparent 65%);
+  }
+  .app::before {
+    content: ""; position: fixed; border-radius: 50%; z-index: -1;
+    width: 460px; height: 460px; top: 40%; left: 45%;
+    background: radial-gradient(circle, var(--orb3), transparent 65%);
+    filter: blur(110px); pointer-events: none;
+  }
+  a { color: var(--accent-text); }
+  ::selection { background: var(--accent-soft); }
+  h1, h2, h3 { margin: 0; font-weight: 600; }
+
+  button {
+    font: inherit; cursor: pointer; border-radius: var(--r-sm);
+    border: 1px solid var(--hairline-strong); background: var(--layer); color: var(--ink);
+    padding: 7px 14px; font-weight: 600; font-size: 13px;
+    backdrop-filter: blur(8px);
+    transition: border-color .15s, background .15s, color .15s, transform .06s, box-shadow .15s, opacity .15s;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-soft); }
+  button:active { transform: translateY(1px); }
+  button.primary {
+    background: linear-gradient(120deg, var(--accent2), var(--accent));
+    border-color: transparent; color: #fff;
+    box-shadow: 0 6px 20px -6px rgba(230, 90, 40, 0.55);
+  }
+  button.primary:hover { filter: brightness(1.07); color: #fff; box-shadow: 0 8px 26px -6px rgba(230, 90, 40, 0.65); }
+  button.quiet { background: transparent; border-color: transparent; color: var(--ink-dim); padding: 7px 10px; backdrop-filter: none; }
+  button.quiet:hover { background: var(--accent-soft); color: var(--accent-text); box-shadow: none; }
+  button.danger-armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+  button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+
+  input, textarea, select {
+    font: inherit; font-size: 13.5px; width: 100%;
+    padding: 9px 12px; border-radius: var(--r-sm);
+    border: 1px solid var(--hairline-strong); background: var(--input-bg); color: var(--ink);
+    backdrop-filter: blur(8px);
+  }
+  input::placeholder, textarea::placeholder { color: var(--ink-faint); }
+  label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 5px; }
+  .field { margin-bottom: 13px; }
+  .hint { font-size: 12px; color: var(--ink-faint); margin-top: 6px; line-height: 1.55; }
+  .error-msg { color: var(--danger); font-size: 13px; margin-top: 8px; }
+  .muted { color: var(--ink-faint); font-size: 12.5px; }
+
+  /* ============ shell ============ */
+  .app { display: flex; min-height: 100vh; padding: 12px; gap: 14px; }
+  .sidebar {
+    width: 234px; flex: none;
+    background: var(--sb-bg); color: var(--sb-ink);
+    backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-xl);
+    box-shadow: var(--glow), var(--inset);
+    display: flex; flex-direction: column;
+    position: sticky; top: 12px; height: calc(100vh - 24px);
+  }
+  .sb-brand { display: flex; align-items: center; gap: 10px; padding: 18px 18px 14px; }
+  .sb-brand .glyph {
+    width: 32px; height: 32px; border-radius: 10px; flex: none;
+    background: linear-gradient(130deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    box-shadow: 0 5px 16px -5px rgba(230, 90, 40, 0.6);
+  }
+  .sb-brand .glyph svg { width: 17px; height: 17px; }
+  .sb-brand .t { font-family: var(--display); font-size: 16px; font-weight: 700; letter-spacing: .01em; }
+  .sb-label { padding: 12px 18px 6px; font-size: 10px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--sb-dim); }
+  nav { flex: 1; overflow-y: auto; padding: 0 8px 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 2px;
+    color: var(--sb-ink); text-decoration: none; font-size: 13.3px; font-weight: 550;
+    border-radius: var(--r-md); border: 1px solid transparent;
+  }
+  .nav-item:hover { background: var(--sb-bg-soft); }
+  .nav-item.active {
+    background: var(--accent-soft); border-color: var(--hairline);
+    box-shadow: var(--inset);
+  }
+  .nav-item .chip {
+    width: 26px; height: 26px; border-radius: 8px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px; font-weight: 700; color: #fff;
+    box-shadow: 0 4px 10px -3px rgba(0, 0, 0, 0.35);
+  }
+  .nav-item .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-item .nbadge {
+    font-size: 10.5px; font-weight: 700; color: var(--accent-text);
+    background: var(--accent-soft); padding: 1px 8px; border-radius: 999px;
+  }
+  .sb-foot { border-top: 1px solid var(--sb-hairline); padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 9px; }
+  .sb-status {
+    display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--sb-dim);
+    text-decoration: none; padding: 6px 8px; margin: -2px -4px 0; border-radius: var(--r-sm);
+    cursor: pointer;
+  }
+  .sb-status:hover { background: var(--sb-bg-soft); color: var(--sb-ink); }
+  .sb-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); flex: none; box-shadow: 0 0 8px var(--warn); }
+  .sb-status.ok .dot { background: var(--good); box-shadow: 0 0 8px var(--good); }
+  .sb-status .gear { margin-left: auto; display: flex; opacity: .7; }
+  .sb-status .gear svg { width: 13px; height: 13px; }
+  .sb-foot button { width: 100%; }
+
+  main { flex: 1; min-width: 0; }
+  .page { max-width: 1080px; margin: 0 auto; padding: 22px 26px 80px; animation: pagein .2s ease; }
+  @keyframes pagein { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .page { animation: none; } }
+
+  .page-head { margin-bottom: 20px; }
+  .page-head .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 5px; }
+  .page-head h1 { font-family: var(--display); font-size: 27px; font-weight: 700; letter-spacing: -.01em; line-height: 1.15; }
+  .page-head .sub { color: var(--ink-dim); font-size: 13.5px; margin-top: 6px; }
+
+  .class-head { display: flex; align-items: flex-start; gap: 14px; }
+  .class-head .bigchip {
+    width: 48px; height: 48px; border-radius: 14px; flex: none; margin-top: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff;
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.4), var(--inset);
+  }
+
+  /* ============ cards & grid ============ */
+  section.card {
+    background: var(--glass);
+    backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg);
+    box-shadow: var(--glow), var(--inset);
+    padding: 19px 21px; margin-bottom: 16px;
+  }
+  .cardgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .cardgrid section.card { margin-bottom: 0; }
+  .card.span2 { grid-column: 1 / -1; }
+  .card-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 13px; }
+  .card-head h2 { font-family: var(--display); font-size: 16px; font-weight: 700; letter-spacing: .005em; }
+  .card-head .count { font-size: 12px; color: var(--ink-faint); font-weight: 600; }
+  .card-head .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 16px; }
+  .stat {
+    background: var(--glass); backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg);
+    padding: 14px 17px; box-shadow: var(--glow), var(--inset);
+  }
+  .stat .n {
+    font-family: var(--display); font-size: 27px; font-weight: 700; line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(120deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .l { font-size: 11.5px; color: var(--ink-dim); font-weight: 600; margin-top: 3px; }
+  .stat.alert .n { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--danger); }
+
+  /* ============ deadlines ============ */
+  .dgroup { margin-bottom: 4px; }
+  .dgroup-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); padding: 10px 0 5px; border-bottom: 1px solid var(--hairline); margin-bottom: 2px;
+  }
+  .dgroup-label.overdue { color: var(--danger); }
+  .drow { display: flex; align-items: center; gap: 11px; padding: 9px 2px; border-bottom: 1px solid var(--hairline); }
+  .drow:last-child { border-bottom: none; }
+  .drow .badge {
+    flex: none; width: 56px; text-align: center; font-size: 10.5px; font-weight: 700;
+    padding: 3px 0; border-radius: 999px; font-variant-numeric: tabular-nums;
+  }
+  .badge.b-over, .badge.b-today { background: var(--danger-soft); color: var(--danger); }
+  .badge.b-soon { background: var(--warn-soft); color: var(--warn); }
+  .badge.b-ok { background: var(--good-soft); color: var(--good); }
+  .badge.b-far { background: var(--layer); color: var(--ink-faint); }
+  .drow .t { flex: 1; min-width: 0; font-weight: 550; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .drow a.t { color: var(--ink); text-decoration: none; }
+  .drow a.t:hover { color: var(--accent-text); text-decoration: underline; }
+  .drow .cls { flex: none; font-size: 11.5px; color: var(--ink-faint); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .drow .when { flex: none; font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+  .show-more { margin-top: 10px; }
+  .dcheck {
+    flex: none; width: 17px; height: 17px; border-radius: 5px; cursor: pointer;
+    border: 1.5px solid var(--hairline-strong); background: var(--input-bg);
+    display: flex; align-items: center; justify-content: center; padding: 0;
+    color: transparent; font-size: 11px; line-height: 1;
+  }
+  .dcheck:hover { border-color: var(--accent); box-shadow: none; }
+  .dcheck.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .done-row { opacity: .5; }
+  .done-row .t { text-decoration: line-through; }
+  .banner {
+    background: var(--danger-soft); border: 1px solid var(--danger); border-radius: var(--r-md);
+    padding: 12px 15px; margin-bottom: 16px; font-size: 13px; color: var(--danger);
+  }
+  .banner b { display: block; margin-bottom: 3px; }
+  .deck-row { display: flex; align-items: center; gap: 9px; padding: 8px 2px; border-bottom: 1px solid var(--hairline); }
+  .deck-row:last-child { border-bottom: none; }
+  .deck-row .q { flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  details.deck { margin-top: 12px; }
+  details.deck summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--ink-faint); }
+  details.deck[open] summary { margin-bottom: 6px; }
+  .dx { padding: 2px 9px; font-size: 15px; line-height: 1.2; color: var(--ink-faint); flex: none; opacity: 0; transition: opacity .12s, color .12s, background .12s; }
+  .drow:hover .dx { opacity: 1; }
+  .dx:hover { color: var(--danger); background: var(--danger-soft); box-shadow: none; }
+  details.cleared { margin-top: 12px; }
+  details.cleared summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--ink-faint); }
+  details.cleared[open] summary { margin-bottom: 4px; }
+  .cleared-row { opacity: .55; }
+  .cleared-row .t { text-decoration: line-through; }
+
+  /* ============ documents ============ */
+  .doc-row { display: flex; align-items: center; gap: 11px; padding: 9px 2px; border-bottom: 1px solid var(--hairline); }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-row .ic { flex: none; width: 32px; height: 32px; border-radius: 9px; background: var(--layer); border: 1px solid var(--hairline); display: flex; align-items: center; justify-content: center; color: var(--ink-dim); }
+  .doc-row .ic svg { width: 15px; height: 15px; }
+  .doc-row .nm { flex: 1; min-width: 0; font-weight: 550; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-row .flag { flex: none; font-size: 10.5px; font-weight: 700; color: var(--warn); background: var(--warn-soft); padding: 2px 8px; border-radius: 999px; }
+  .doc-row .del { flex: none; }
+  .dropzone {
+    border: 1.5px dashed var(--hairline-strong); border-radius: var(--r-md);
+    padding: 18px; text-align: center; color: var(--ink-faint); font-size: 13px;
+    cursor: pointer; margin-top: 12px; transition: border-color .15s, background .15s, color .15s;
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
+  details.paste { margin-top: 12px; }
+  details.paste summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-dim); }
+  details.paste[open] summary { margin-bottom: 10px; }
+
+  /* ---- struggle ladder: support that fades one rung at a time ---- */
+  .lad-new { display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; }
+  .lad-new .field { flex:1; min-width:240px; margin:0; }
+  .lad { border:1px solid var(--hairline); border-radius: var(--r-lg); padding:16px 17px; margin-bottom:12px;
+    background: var(--layer); }
+  .lad.open { border-color: var(--hairline-strong); box-shadow: var(--inset); }
+  .lad.grad { background: var(--good-soft); border-color: rgba(31,160,106,0.28); }
+  .lad-top { display:flex; gap:12px; align-items:flex-start; }
+  .lad-top .sg { flex:1; min-width:0; font-size:15px; font-weight:650; line-height:1.45; }
+  .lad-top .sg small { display:block; font-weight:500; font-size:12px; color: var(--ink-faint); margin-top:3px; }
+  .rungs { display:flex; gap:5px; margin:13px 0 4px; }
+  .rung { flex:1; height:5px; border-radius:3px; background: var(--hairline); position:relative; }
+  .rung.done { background: var(--accent); }
+  .rung.now { background: linear-gradient(90deg, var(--accent), var(--accent2)); box-shadow:0 0 0 2px var(--accent-soft); }
+  .rung-labels { display:flex; gap:5px; font-size:10.5px; color: var(--ink-faint); letter-spacing:.02em; }
+  .rung-labels span { flex:1; text-align:center; line-height:1.25; }
+  .rung-labels span.now { color: var(--accent-text); font-weight:750; }
+  .lad-support { margin:12px 0 0; padding:10px 13px; border-radius: var(--r-sm); background: var(--accent-soft);
+    border:1px solid rgba(224,81,44,0.18); font-size:12.5px; line-height:1.5; color: var(--ink-dim); }
+  .lad-support b { color: var(--ink); }
+  .blank-row { display:flex; gap:10px; align-items:flex-start; padding:9px 12px; margin-bottom:6px;
+    border-radius: var(--r-sm); background: var(--warn-soft); border:1px dashed rgba(178,130,32,0.4); font-size:13.5px; line-height:1.5; }
+  .blank-row .bn { font-size:11px; font-weight:800; color: var(--warn); white-space:nowrap; padding-top:2px; letter-spacing:.05em; }
+  .verdict { display:flex; gap:12px; align-items:flex-start; padding:13px 15px; border-radius: var(--r-md); margin-top:14px; }
+  .verdict.correct { background: var(--good-soft); border:1px solid rgba(31,160,106,0.25); }
+  .verdict.partial { background: var(--warn-soft); border:1px solid rgba(178,130,32,0.28); }
+  .verdict.wrong { background: var(--danger-soft); border:1px solid rgba(214,69,83,0.25); }
+  .verdict .vk { font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; padding-top:2px; }
+  .verdict.correct .vk { color: var(--good); }
+  .verdict.partial .vk { color: var(--warn); }
+  .verdict.wrong .vk { color: var(--danger); }
+  .verdict .vb { font-size:13.5px; line-height:1.55; }
+  .verdict .vb .wr { display:block; margin-top:7px; color: var(--ink-dim); }
+  .lad-move { margin-top:10px; font-size:13px; font-weight:650; color: var(--accent-text); }
+  .lad-hist summary { cursor:pointer; font-size:12px; font-weight:600; color: var(--ink-faint); margin-top:12px; }
+  .lad-hist .hrow { display:flex; gap:10px; align-items:baseline; padding:7px 0; border-bottom:1px solid var(--hairline); font-size:12.5px; }
+  .lad-hist .hrow:last-child { border-bottom:none; }
+  .lad-hist .hv { font-size:10.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; }
+  .lad-hist .hv.correct { color: var(--good); }
+  .lad-hist .hv.partial { color: var(--warn); }
+  .lad-hist .hv.wrong { color: var(--danger); }
+
+  /* ---- study modes: the picker, and the six kinds of session ---- */
+  .mode-rec { display:flex; gap:12px; align-items:flex-start; padding:13px 15px; margin-bottom:14px;
+    border-radius: var(--r-md); background: var(--accent-soft);
+    border: 1px solid rgba(224,81,44,0.20); }
+  .mode-rec .rk { font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    color: var(--accent-text); white-space:nowrap; padding-top:1px; }
+  .mode-rec .rtx { font-size:13.5px; line-height:1.5; color: var(--ink-dim); }
+  .mode-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap:9px; }
+  .mode-b { text-align:left; padding:11px 12px; border-radius: var(--r-md); cursor:pointer;
+    background: var(--layer); border:1px solid var(--hairline); transition: all .16s ease; font:inherit; color:inherit; }
+  .mode-b:hover { border-color: var(--hairline-strong); transform: translateY(-1px); }
+  .mode-b.on { background: var(--accent-soft); border-color: var(--accent); box-shadow: var(--inset); }
+  .mode-b .mn { display:block; font-weight:700; font-size:13.5px; margin-bottom:3px; }
+  .mode-b .mb { display:block; font-size:11.5px; line-height:1.4; color: var(--ink-faint); }
+  .mode-b .star { display:block; color: var(--accent-text); font-size:10.5px; font-weight:800;
+    letter-spacing:.06em; margin-bottom:4px; }
+  .mode-when { margin:12px 0 0; padding:11px 13px; border-radius: var(--r-sm);
+    background: var(--layer); border:1px solid var(--hairline); font-size:12.5px; line-height:1.55; color: var(--ink-dim); }
+  .mode-when b { color: var(--ink); }
+  .study-out { margin-top:16px; }
+  .sx { margin-bottom:16px; }
+  .sx h4 { font-family: var(--display); font-size:13px; text-transform:uppercase; letter-spacing:.07em;
+    color: var(--ink-faint); margin:0 0 7px; }
+  .sx-prob { padding:14px 16px; border-radius: var(--r-md); background: var(--accent-soft);
+    border:1px solid rgba(224,81,44,0.20); font-size:15px; line-height:1.6; }
+  .sx-step { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--hairline); }
+  .sx-step:last-child { border-bottom:none; }
+  .sx-step .n { flex:0 0 24px; height:24px; border-radius:50%; display:grid; place-items:center;
+    background: var(--accent); color:#fff; font-size:11.5px; font-weight:800; }
+  .sx-step .act { font-size:14px; line-height:1.55; }
+  .sx-step .why { font-size:12.5px; line-height:1.5; color: var(--ink-dim); margin-top:4px; font-style:italic; }
+  .sx-hint { border:1px solid var(--hairline); border-radius: var(--r-sm); margin-bottom:8px; overflow:hidden; }
+  .sx-hint summary { cursor:pointer; padding:10px 13px; font-size:13px; font-weight:650; list-style:none; }
+  .sx-hint summary::-webkit-details-marker { display:none; }
+  .sx-hint summary::before { content:'▸ '; color: var(--accent-text); }
+  .sx-hint[open] summary::before { content:'▾ '; }
+  .sx-hint .hb { padding:0 13px 12px; font-size:13.5px; line-height:1.6; color: var(--ink-dim); }
+  .sx-note { padding:11px 13px; border-radius: var(--r-sm); font-size:13px; line-height:1.55; }
+  .sx-note.key { background: var(--good-soft); border:1px solid rgba(31,160,106,0.22); }
+  .sx-note.miss { background: var(--warn-soft); border:1px solid rgba(178,130,32,0.24); }
+  .sx-qa { padding:12px 0; border-bottom:1px solid var(--hairline); }
+  .sx-qa:last-child { border-bottom:none; }
+  .sx-qa .qq { font-size:14px; font-weight:650; line-height:1.5; }
+  .sx-qa .aa { font-size:13.5px; line-height:1.6; color: var(--ink-dim); margin-top:6px; }
+  .sx-qa .cc { font-size:11.5px; color: var(--accent-text); margin-top:5px; font-weight:650; }
+  .sx-link { display:flex; gap:8px; align-items:baseline; padding:8px 0; border-bottom:1px solid var(--hairline); font-size:13.5px; }
+  .sx-link:last-child { border-bottom:none; }
+  .sx-link .rel { color: var(--accent-text); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+  .sx-eq { display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline; padding:9px 0; border-bottom:1px solid var(--hairline); }
+  .sx-eq:last-child { border-bottom:none; }
+  .sx-eq code { font-size:14px; font-weight:650; background:none; padding:0; }
+  .sx-eq .vw { font-size:12px; color: var(--ink-faint); }
+  .sx-score { font-family: var(--display); font-size:30px; font-weight:800; line-height:1; }
+  .sx-src { font-size:11.5px; color: var(--ink-faint); margin-top:14px; }
+  .orphan-warn { padding:12px 14px; border-radius: var(--r-md); margin-bottom:12px;
+    background: var(--warn-soft); border:1px solid rgba(178,130,32,0.28); font-size:13px; line-height:1.55; }
+  .orphan-warn b { display:block; margin-bottom:4px; }
+  .orphan-warn button { border:1px solid var(--hairline-strong); background: var(--glass-strong); }
+  .study-out:not(:empty) { margin-top:20px; padding-top:18px; border-top:1px solid var(--hairline); }
+
+  /* ============ study ============ */
+  .qcard { background: var(--layer); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 15px 17px; margin-bottom: 10px; box-shadow: var(--inset); }
+  .qcard .q { font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+  .qcard .a { font-size: 13.5px; color: var(--ink-dim); margin-bottom: 12px; padding-top: 10px; border-top: 1px dashed var(--hairline-strong); }
+  .rate-row { display: flex; gap: 7px; }
+  .rate-row button { flex: 1; font-size: 12.5px; padding: 6px 0; }
+
+  /* ============ topics ============ */
+  .topic-row { display: flex; align-items: center; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--hairline); }
+  .topic-row:last-child { border-bottom: none; }
+  .topic-row .t { flex: 1; font-size: 13.5px; font-weight: 550; }
+  .topic-summary { display: none; font-size: 13.3px; color: var(--ink-dim); background: var(--layer); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 11px 13px; margin: 7px 0; line-height: 1.6; }
+
+  /* ============ draft ============ */
+  .draft-out { display: none; margin-top: 14px; }
+  .draft-tag { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; color: var(--warn); background: var(--warn-soft); padding: 3px 10px; border-radius: 999px; margin-bottom: 9px; }
+  .draft-body { white-space: pre-wrap; font-size: 13.3px; background: var(--layer); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 14px 16px; max-height: 380px; overflow-y: auto; line-height: 1.6; }
+
+  /* ============ briefing ============ */
+  .brief-body { line-height: 1.6; }
+  .brief-h {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent-text); padding: 12px 0 5px; border-bottom: 1px solid var(--hairline); margin-bottom: 4px;
+  }
+  .brief-h:first-child { padding-top: 0; }
+  .brief-li { font-size: 13.5px; padding: 4px 0 4px 16px; position: relative; }
+  .brief-li::before { content: "—"; position: absolute; left: 0; color: var(--ink-faint); }
+  .brief-li.check { display: flex; align-items: flex-start; gap: 9px; padding: 6px 0 6px 0;
+    cursor: pointer; border-radius: var(--r-sm);
+    /* Reset the global form-label styling — this is a label element, and
+       without these it inherits uppercase 11px bold from `label {}`. */
+    text-transform: none; letter-spacing: normal; font-size: 13.5px;
+    font-weight: 400; color: var(--ink); margin-bottom: 0; }
+  .brief-li.check::before { content: none; }
+  .brief-li.check input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .brief-li.check .tick { flex: none; width: 17px; height: 17px; margin-top: 1px; border-radius: 5px;
+    border: 1.5px solid var(--hairline-strong); background: var(--input-bg);
+    display: flex; align-items: center; justify-content: center; transition: background .14s, border-color .14s; }
+  .brief-li.check .tick::after { content: "✓"; font-size: 11px; font-weight: 700; color: transparent; line-height: 1; }
+  .brief-li.check:hover .tick { border-color: var(--accent); }
+  .brief-li.check .txt { flex: 1; transition: color .14s, opacity .14s; }
+  .brief-li.check.done .tick { background: var(--accent); border-color: var(--accent); }
+  .brief-li.check.done .tick::after { color: #fff; }
+  @media (prefers-color-scheme: dark) { .brief-li.check.done .tick::after { color: #1a0d09; } }
+  .brief-li.check.done .txt { text-decoration: line-through; color: var(--ink-faint); }
+  .brief-p { font-size: 13.5px; margin: 6px 0; }
+
+  /* ============ grades ============ */
+  .gradehead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .gradebig { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1;
+    background: linear-gradient(120deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+  .gradeletter { font-size: 15px; font-weight: 700; color: var(--ink-dim); }
+  .comp-row { display: flex; align-items: center; gap: 10px; padding: 7px 2px; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+  .comp-row:last-child { border-bottom: none; }
+  .comp-row .nm { flex: 1; font-weight: 600; }
+  .comp-row .w { color: var(--ink-faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .comp-row .pct { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 52px; text-align: right; }
+  .bar { height: 5px; border-radius: 999px; background: var(--layer); overflow: hidden; margin-top: 10px; }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+  .target-row { display: flex; align-items: center; gap: 10px; padding: 6px 2px; font-size: 13px; }
+  .target-row .l { font-weight: 700; width: 30px; }
+  .target-row.unreachable { opacity: .45; }
+  .target-row .need { font-variant-numeric: tabular-nums; }
+  .worth { flex: none; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+  .worth.big { background: var(--danger-soft); color: var(--danger); }
+  .unconfirmed { font-size: 11.5px; font-weight: 700; color: var(--warn); background: var(--warn-soft); padding: 2px 8px; border-radius: 999px; }
+  .standing { display: flex; align-items: center; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+  .standing:last-child { border-bottom: none; }
+  .standing .nm { flex: 1; font-weight: 600; }
+  .standing .pct { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ============ focus mode ============ */
+  .focus-shell { min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 26px 20px 60px; animation: pagein .2s ease; }
+  .focus-bar { width: 100%; max-width: 720px; display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+  .focus-bar .who { font-weight: 700; font-size: 14px; }
+  .focus-bar .meta { color: var(--ink-faint); font-size: 12.5px; }
+  .focus-bar .timer { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700;
+    font-size: 14px; color: var(--ink-dim); }
+  .focus-body { width: 100%; max-width: 720px; }
+  .focus-card { background: var(--glass); backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-xl); box-shadow: var(--glow), var(--inset);
+    padding: 30px 32px; }
+  .focus-q { font-family: var(--display); font-size: 22px; font-weight: 600; line-height: 1.35; }
+  .focus-a { font-size: 15px; color: var(--ink-dim); line-height: 1.6; margin-top: 18px; padding-top: 18px;
+    border-top: 1px dashed var(--hairline-strong); }
+  .focus-progress { font-size: 12px; color: var(--ink-faint); font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; margin-bottom: 12px; }
+  .focus-actions { display: flex; gap: 8px; margin-top: 24px; }
+  .focus-actions button { flex: 1; padding: 11px 0; }
+  .pick-row { display: flex; align-items: center; gap: 12px; padding: 13px 15px; margin-bottom: 9px;
+    background: var(--glass); border: 1px solid var(--hairline); border-radius: var(--r-md);
+    box-shadow: var(--inset); cursor: pointer; text-decoration: none; color: var(--ink); }
+  .pick-row:hover { border-color: var(--accent); }
+  .pick-row.hero { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--inset); }
+  .pick-row .chip { width: 30px; height: 30px; border-radius: 9px; flex: none; display: flex;
+    align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+  .pick-row .t { flex: 1; font-weight: 600; font-size: 13.8px; }
+  .pick-row .sub { display: block; font-weight: 400; font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .focus-done { text-align: center; padding: 30px 10px; }
+  .focus-done .big { font-family: var(--display); font-size: 34px; font-weight: 700;
+    background: linear-gradient(120deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* ============ empty states ============ */
+  .empty { text-align: center; padding: 20px 12px 10px; color: var(--ink-dim); }
+  .empty .eic { width: 40px; height: 40px; margin: 0 auto 9px; border-radius: 12px; background: var(--layer); border: 1px solid var(--hairline); display: flex; align-items: center; justify-content: center; color: var(--ink-faint); }
+  .empty .eic svg { width: 18px; height: 18px; }
+  .empty p { margin: 0; font-size: 13.3px; max-width: 340px; margin-left: auto; margin-right: auto; line-height: 1.55; }
+
+  /* ============ activity ============ */
+  .activity { font-size: 12.5px; color: var(--ink-dim); max-height: 170px; overflow-y: auto; }
+  .activity div { padding: 5px 0; border-bottom: 1px solid var(--hairline); }
+  .activity div:last-child { border-bottom: none; }
+
+  /* ============ modal ============ */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(18, 10, 8, 0.45); backdrop-filter: blur(6px);
+    display: none; align-items: flex-start; justify-content: center; padding: 8vh 20px; z-index: 40;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--glass-strong); backdrop-filter: blur(26px) saturate(1.6);
+    border: 1px solid var(--hairline-strong); border-radius: var(--r-lg);
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.5), var(--inset);
+    width: 100%; max-width: 480px; padding: 24px 26px;
+    animation: pagein .18s ease;
+  }
+  .modal h2 { font-family: var(--display); font-size: 19px; font-weight: 700; margin-bottom: 16px; }
+  .modal .row2 { display: flex; gap: 12px; }
+  .modal .row2 .field { flex: 1; }
+  .modal .actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 6px; }
+  details.why { margin: -4px 0 14px; }
+  details.why summary { cursor: pointer; font-size: 12px; color: var(--ink-faint); }
+  details.why .body { font-size: 12.5px; color: var(--ink-dim); background: var(--layer); border-radius: var(--r-sm); padding: 10px 12px; margin-top: 7px; line-height: 1.6; }
+
+  /* ============ chat ============ */
+  .chat-page { max-width: 1120px; }
+  .chat-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .chat-side { position: sticky; top: 22px; }
+  .chat-list { margin-top: 10px; max-height: 60vh; overflow-y: auto; }
+  .chat-item { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: var(--r-sm);
+    cursor: pointer; font-size: 12.8px; color: var(--ink-dim); }
+  .chat-item:hover { background: var(--accent-soft); color: var(--ink); }
+  .chat-item.on { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+  .chat-item .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chat-main { background: var(--glass); backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg); box-shadow: var(--glow), var(--inset);
+    display: flex; flex-direction: column; min-height: 62vh; }
+  .chat-thread { flex: 1; overflow-y: auto; max-height: 60vh; padding: 20px 22px; }
+  .msg { margin-bottom: 18px; }
+  .msg .who { font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 5px; }
+  .msg.user .who { color: var(--accent-text); }
+  .msg .body { font-size: 13.8px; line-height: 1.65; white-space: pre-wrap; }
+  .msg.user .body { background: var(--accent-soft); border-radius: var(--r-md); padding: 11px 14px; }
+  .msg-mentions { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .mention-chip { display: inline-flex; align-items: center; gap: 2px; font-size: 11.5px; font-weight: 600;
+    background: var(--accent-soft); color: var(--accent-text); padding: 2px 8px; border-radius: 999px; }
+  .mention-chip.file { background: var(--good-soft); color: var(--good); }
+  .attach-btn { flex: none; padding: 10px; border: 1px solid var(--hairline-strong); background: var(--layer); }
+  .attach-btn svg { width: 16px; height: 16px; display: block; }
+  .upload-warn { font-size: 12.5px; color: var(--warn); background: var(--warn-soft);
+    border-radius: var(--r-sm); padding: 8px 11px; margin-bottom: 9px;
+    display: flex; align-items: flex-start; gap: 6px; }
+  .chat-main { position: relative; }
+  .chat-drop { position: absolute; inset: 0; z-index: 15; display: none;
+    align-items: center; justify-content: center; border-radius: var(--r-lg);
+    background: var(--accent-soft); border: 2px dashed var(--accent);
+    color: var(--accent-text); font-weight: 700; font-size: 14px; pointer-events: none; }
+  .chat-drop.on { display: flex; }
+  .chat-compose { border-top: 1px solid var(--hairline); padding: 14px 18px 16px; position: relative; }
+  .chat-compose .picked { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+  .compose-row { display: flex; gap: 9px; align-items: flex-end; }
+  .compose-row textarea { flex: 1; resize: vertical; min-height: 46px; }
+  .mention-menu { position: absolute; bottom: 100%; left: 18px; right: 18px; margin-bottom: 6px;
+    background: var(--glass-strong); backdrop-filter: blur(22px) saturate(1.6);
+    border: 1px solid var(--hairline-strong); border-radius: var(--r-md);
+    box-shadow: var(--shadow-pop); overflow: hidden; z-index: 20; max-height: 260px; overflow-y: auto; }
+  .mention-opt { display: flex; align-items: center; gap: 9px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
+  .mention-opt.on, .mention-opt:hover { background: var(--accent-soft); }
+  .mention-opt .kind { flex: none; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--accent-text); background: var(--accent-soft);
+    padding: 2px 6px; border-radius: 4px; min-width: 38px; text-align: center; }
+  .mention-opt .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 860px) { .chat-layout { grid-template-columns: 1fr; } .chat-side { position: static; } }
+
+  /* ============ class hero ============ */
+  .class-hero { display: flex; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
+  .class-hero h1 { font-family: var(--display); font-size: 25px; font-weight: 700; letter-spacing: -.01em;
+    line-height: 1.2; overflow: hidden; text-overflow: ellipsis; }
+  .class-hero .sub { color: var(--ink-dim); font-size: 13px; margin-top: 3px; }
+  .class-hero .bigchip { width: 50px; height: 50px; border-radius: 15px; flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff;
+    box-shadow: 0 8px 20px -6px rgba(0,0,0,.4), var(--inset); }
+  .hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .hstat { background: var(--glass); backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 11px 14px;
+    box-shadow: var(--glow), var(--inset); }
+  .hstat .n { font-family: var(--display); font-size: 20px; font-weight: 700; line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(120deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hstat.alert .n { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--danger); }
+  .hstat .l { font-size: 11px; color: var(--ink-dim); font-weight: 600; margin-top: 2px; }
+  .tabdot { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px;
+    padding: 0 4px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 10px;
+    font-weight: 700; margin-left: 4px; vertical-align: 1px; }
+  @media (prefers-color-scheme: dark) { .tabdot { color: #1a0d09; } }
+
+  /* ============ sub-tabs ============ */
+  .subtabs { display: flex; gap: 4px; margin-bottom: 20px; padding: 4px; border-radius: var(--r-md);
+    background: var(--layer); border: 1px solid var(--hairline); width: fit-content; max-width: 100%;
+    overflow-x: auto; }
+  .subtabs a { padding: 7px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600;
+    color: var(--ink-dim); text-decoration: none; white-space: nowrap; }
+  .subtabs a:hover { color: var(--ink); }
+  .subtabs a.on { background: var(--surface, var(--glass)); color: var(--accent-text);
+    box-shadow: var(--inset); border: 1px solid var(--hairline); padding: 6px 13px; }
+
+  /* ============ help / guide ============ */
+  .help-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 26px; align-items: start; }
+  .help-toc { position: sticky; top: 22px; }
+  .help-toc a { display: block; padding: 5px 10px; font-size: 12.5px; color: var(--ink-dim);
+    text-decoration: none; border-left: 2px solid var(--hairline); }
+  .help-toc a:hover { color: var(--accent-text); border-left-color: var(--accent); }
+  .help-sec { margin-bottom: 30px; scroll-margin-top: 20px; }
+  .help-sec h3 { font-family: var(--display); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .help-sec .lede { color: var(--ink-dim); font-size: 13.3px; margin: 0 0 14px; line-height: 1.6; }
+  .help-sec p { font-size: 13.5px; line-height: 1.65; margin: 0 0 11px; }
+  .help-sec ul { margin: 0 0 12px; padding-left: 0; list-style: none; }
+  .help-sec li { font-size: 13.4px; line-height: 1.6; padding: 4px 0 4px 17px; position: relative; }
+  .help-sec li::before { content: "›"; position: absolute; left: 2px; color: var(--accent-text); font-weight: 700; }
+  .help-steps { counter-reset: hs; list-style: none; padding: 0; margin: 0 0 14px; }
+  .help-steps li { counter-increment: hs; display: flex; gap: 11px; font-size: 13.4px; line-height: 1.6;
+    padding: 7px 0; align-items: flex-start; }
+  .help-steps li::before { content: counter(hs); position: static; flex: none; width: 20px; height: 20px;
+    border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); font-size: 11px;
+    font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .help-sec code { background: var(--layer); border: 1px solid var(--hairline); border-radius: 5px;
+    padding: 1px 6px; font-size: 12.3px; }
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 11px 14px; margin: 12px 0; font-size: 13.2px; line-height: 1.6; }
+  .callout.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .kv { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--hairline); font-size: 13.2px; }
+  .kv:last-child { border-bottom: none; }
+  .kv .k { flex: none; width: 150px; font-weight: 600; }
+  .kv .v { flex: 1; color: var(--ink-dim); }
+  @media (max-width: 760px) { .help-layout { grid-template-columns: 1fr; } .help-toc { position: static; display: none; } }
+
+  /* ============ settings ============ */
+  .settings-note { font-size: 12.5px; color: var(--ink-dim); line-height: 1.6; margin-bottom: 14px; }
+  .provider-line { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+  .provider-line .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; box-shadow: 0 0 10px currentColor; }
+  .test-result { font-size: 12.5px; margin-top: 8px; }
+  .pill-on { font-size: 11px; font-weight: 700; color: var(--good); background: var(--good-soft);
+    padding: 2px 9px; border-radius: 999px; }
+
+  /* ============ onboarding ============ */
+  .onboard { max-width: 560px; margin: 7vh auto 0; text-align: center; }
+  .onboard .glyph {
+    width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 16px;
+    background: linear-gradient(130deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    box-shadow: 0 14px 34px -10px rgba(230, 90, 40, 0.6);
+  }
+  .onboard .glyph svg { width: 28px; height: 28px; }
+  .onboard h1 { font-family: var(--display); font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .onboard .lead { color: var(--ink-dim); font-size: 14px; margin-bottom: 24px; }
+  .onboard .card {
+    text-align: left; background: var(--glass); backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg);
+    box-shadow: var(--glow), var(--inset); padding: 24px 26px;
+  }
+  .steps { list-style: none; margin: 0 0 16px; padding: 0; }
+  .steps li { display: flex; gap: 10px; font-size: 13px; color: var(--ink-dim); margin-bottom: 8px; }
+  .steps li .n { flex: none; width: 19px; height: 19px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+
+  @media (max-width: 860px) {
+    .app { flex-direction: column; padding: 10px; }
+    .sidebar { width: 100%; height: auto; position: static; }
+    nav { display: flex; overflow-x: auto; padding: 0 8px 8px; }
+    .nav-item { white-space: nowrap; }
+    .sb-label { display: none; }
+    .page { padding: 18px 8px 70px; }
+    .cardgrid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg></div>
+      <div class="t">School Agent</div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="sb-foot">
+      <a id="sb-status" class="sb-status" href="#/settings" title="Model settings"><span class="dot"></span><span id="sb-status-t">checking model…</span>
+        <span class="gear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span></a>
+      <button class="primary" onclick="location.hash = '#/focus'">Start focus session</button>
+      <button id="sync-btn" onclick="syncNow()">Sync now</button>
+      <button onclick="openModal()">+ Add class</button>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<!-- add-class modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <h2>Add a class</h2>
+    <div class="field">
+      <label>Class name</label>
+      <input id="m-name" placeholder="COURSE.101 — Thermodynamics I">
+    </div>
+    <div class="row2">
+      <div class="field"><label>Term <span style="text-transform:none;font-weight:500">(optional)</span></label><input id="m-term" placeholder="Fall 2026"></div>
+      <div class="field"><label>Instructor <span style="text-transform:none;font-weight:500">(optional)</span></label><input id="m-instructor" placeholder="Prof. Example"></div>
+    </div>
+    <div class="field">
+      <label>MyCourses calendar feed URL <span style="text-transform:none;font-weight:500">(optional)</span></label>
+      <input id="m-ics" placeholder="https://mycourses.example.edu/d2l/le/calendar/feed/user/feed.ics?feedOU=...&token=...">
+      <div class="hint">MyCourses → Calendar → <b>Subscribe</b> → pick the course in the dropdown → copy the URL. One class per feed link.</div>
+    </div>
+    <details class="why">
+      <summary>Why isn't there a Brightspace login?</summary>
+      <div class="body">Brightspace's account API is locked behind RIT's IT department — students can't self-issue access. The calendar feed link is D2L's own self-service alternative: no password ever touches this app, and you can invalidate the link any time from MyCourses (Subscribe → Reset).</div>
+    </details>
+    <div class="field">
+      <label>Filter keyword <span style="text-transform:none;font-weight:500">(optional — only if reusing one feed across classes)</span></label>
+      <input id="m-filter" placeholder="e.g. COURSE.102">
+    </div>
+    <div id="m-error" class="error-msg"></div>
+    <div class="actions">
+      <button onclick="closeModal()">Cancel</button>
+      <button class="primary" id="m-submit" onclick="submitAddClass()">Add class</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// A value interpolated into an inline handler passes through TWO parsers: the
+// HTML attribute parser first, then JavaScript. esc() only defends the first
+// one — the browser turns &#39; back into ' before the JS parser runs, so
+// onclick="f(${jsArg(x)})" with x = "a');alert(1);('" executes. Every id here
+// is attacker-influenced: deadline uids come from the ICS feed, filenames come
+// from whoever sent you the file, grading component names come from a model
+// reading a PDF.
+//
+// jsArg emits the argument INCLUDING its quotes, JSON-escaped and then
+// HTML-escaped, so both parsers see something well-formed:
+//   onclick="f(${jsArg(x)})"  ->  onclick="f(&quot;a&#39;);alert(1);(&#39;&quot;)"
+//   which the browser decodes to  f("a');alert(1);('")  — one string, inert.
+const jsArg = (v) => esc(JSON.stringify(v === undefined || v === null ? '' : String(v)));
+
+// Only http(s) may reach an href. esc() happily passes "javascript:..." through
+// untouched, and deadline links come from the ICS feed's URL/DESCRIPTION.
+// What an item is worth for SORTING. An unknown per-item share must not sort
+// as zero: "Exams: 70%" with no stated count would otherwise rank beneath a
+// 3% problem set. Falls back to the component's own weight.
+const orderWeight = (d) => (d && d.impact && (d.impact.ordering_weight ?? d.impact.item_weight)) || 0;
+// ...and what to SHOW, which is only ever a number we actually know.
+const worthLabel = (d) => {
+  const i = d && d.impact;
+  if (!i) return '';
+  if (i.item_weight) return fmtPct(i.item_weight) + '%';
+  return i.component_weight ? fmtPct(i.component_weight) + '% bucket' : '';
+};
+
+const safeUrl = (u) => {
+  const raw = String(u ?? '').trim();
+  return /^https?:\/\//i.test(raw) ? raw : '';
+};
+
+const state = { classes: [], deadlines: [], due: [], activity: [], llm: false, materials: {}, topics: {}, settings: {}, deck: {}, grades: {}, study: {}, briefing: null, briefChecked: new Set(), configError: null, loaded: false };
+let showAllLater = false;
+
+const postJSON = (path, body) => api(path, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}),
+});
+
+async function api(path, opts) {
+  const resp = await fetch(path, opts);
+  const body = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    const err = new Error(body.error || `request failed (${resp.status})`);
+    // Structured fields travel with the error — a caller that knows what
+    // "stage" means can say something far more useful than the raw text.
+    Object.assign(err, { stage: body.stage, available: body.available, status: resp.status });
+    throw err;
+  }
+  return body;
+}
+
+/* ---------- visual helpers ---------- */
+function hue(slug) { let h = 0; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; }
+function chipStyle(slug) { return `background:hsl(${hue(slug)} 38% 42%)`; }
+function initials(name) {
+  const parts = String(name).split(/[\s—–-]+/).filter(Boolean);
+  return (parts.length >= 2 ? parts[0][0] + parts[1][0] : (parts[0] || '?').slice(0, 2)).toUpperCase();
+}
+function fmtPct(n) { return Number(n).toFixed(Number(n) % 1 ? 1 : 0); }
+
+function fmtDue(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' +
+         d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+function badge(days) {
+  if (days === null || days === undefined) return '<span class="badge b-far">—</span>';
+  if (days < 0) return '<span class="badge b-over">overdue</span>';
+  if (days === 0) return '<span class="badge b-today">today</span>';
+  if (days === 1) return '<span class="badge b-soon">1 day</span>';
+  if (days <= 3) return `<span class="badge b-soon">${days} days</span>`;
+  if (days <= 7) return `<span class="badge b-ok">${days} days</span>`;
+  return `<span class="badge b-far">${days}d</span>`;
+}
+const IC = {
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>',
+  cards: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>',
+};
+
+/* ---------- data ---------- */
+async function loadAll() {
+  const [status, classes, deadlines, due, activity, settings, brief] = await Promise.all([
+    api('/api/status'), api('/api/classes'), api('/api/deadlines'), api('/api/quiz/due'), api('/api/activity'),
+    api('/api/settings').catch(() => ({})),
+    api('/api/briefing').catch(() => ({ exists: false })),
+  ]);
+  state.llm = status.llm_configured;
+  state.configError = status.config_error || null;
+  state.settings = settings;
+  state.briefing = brief && brief.exists ? brief : null;
+  state.briefChecked = new Set((brief && brief.checked) || []);
+  state.classes = classes;
+  state.deadlines = deadlines;
+  state.due = due;
+  state.activity = activity;
+  const mats = await Promise.all(classes.map(c => api('/api/materials/' + c.slug).catch(() => [])));
+  const tops = await Promise.all(classes.map(c => api('/api/getahead/' + c.slug).catch(() => [])));
+  const decks = await Promise.all(classes.map(c => api('/api/quiz/deck/' + c.slug).catch(() => [])));
+  const grades = await Promise.all(classes.map(c => api('/api/grades/' + c.slug).catch(() => null)));
+  state.study = await api('/api/sessions').catch(() => ({}));
+  await loadChatList();
+  state.materials = {}; state.topics = {}; state.deck = {}; state.grades = {};
+  classes.forEach((c, i) => {
+    state.materials[c.slug] = mats[i]; state.topics[c.slug] = tops[i];
+    state.deck[c.slug] = decks[i]; state.grades[c.slug] = grades[i];
+  });
+  state.loaded = true;
+}
+
+/* ---------- routing ---------- */
+function currentRoute() {
+  if (location.hash === '#/settings') return { view: 'settings', tab: 'model' };
+  if (location.hash === '#/settings/help') return { view: 'settings', tab: 'help' };
+  if (location.hash === '#/focus') return { view: 'focus-pick' };
+  if (location.hash === '#/chat') return { view: 'chat' };
+  const f = location.hash.match(/^#\/focus\/([^/]+)\/([^/]+)$/);
+  if (f) return { view: 'focus', slug: decodeURIComponent(f[1]), kind: decodeURIComponent(f[2]) };
+  const m = location.hash.match(/^#\/class\/([^/]+)(?:\/([^/]+))?$/);
+  return m ? { view: 'class', slug: decodeURIComponent(m[1]), tab: m[2] || 'overview' } : { view: 'overview' };
+}
+
+function render() {
+  renderNav();
+  renderStatus();
+  const main = $('main');
+  if (!state.loaded) { main.innerHTML = '<div class="page"><div class="empty"><p>Loading…</p></div></div>'; return; }
+  const r = currentRoute();
+  const focusing = r.view === 'focus-pick' || r.view === 'focus';
+  const sb = document.querySelector('.sidebar');
+  if (sb) sb.style.display = focusing ? 'none' : '';
+  if (r.view === 'chat') {
+    main.innerHTML = chatHTML();
+    wireChatDrop();
+    const t = $('chat-thread'); if (t) t.scrollTop = t.scrollHeight;
+    return;
+  }
+  if (r.view === 'focus-pick') { main.innerHTML = focusPickerHTML(); return; }
+  if (r.view === 'focus') { renderFocus(r); return; }
+  if (r.view === 'settings') { main.innerHTML = r.tab === 'help' ? helpHTML() : settingsHTML(); return; }
+  if (!state.classes.length) { main.innerHTML = onboardingHTML(); return; }
+  if (r.view === 'class') {
+    const c = state.classes.find(x => x.slug === r.slug);
+    main.innerHTML = c ? classHTML(c, r.tab) : overviewHTML();
+    if (c) wireClassView(c);
+    // Lazily loaded rather than folded into the main refresh: it is one
+    // request per class and only the Study tab ever shows it.
+    if (c && r.tab === 'study') { loadStudy(c.slug); loadLadders(c.slug); }
+  } else {
+    main.innerHTML = overviewHTML();
+  }
+  updateBriefProgress();
+}
+
+function renderStatus() {
+  const el = $('sb-status');
+  el.className = 'sb-status' + (state.llm ? ' ok' : '');
+  $('sb-status-t').textContent = state.llm ? 'model connected' : 'no model configured';
+}
+
+function renderNav() {
+  const r = currentRoute();
+  const items = [`<a class="nav-item ${r.view === 'overview' ? 'active' : ''}" href="#/">
+      <span class="chip" style="background:var(--sb-bg-soft);border:1px solid var(--sb-hairline);color:var(--sb-dim)">${IC.cal.replace('stroke-width="2"','stroke-width="2.2" width="13" height="13"')}</span>
+      <span class="nm">Overview</span></a>`,
+    `<a class="nav-item ${r.view === 'chat' ? 'active' : ''}" href="#/chat">
+      <span class="chip" style="background:var(--sb-bg-soft);border:1px solid var(--sb-hairline);color:var(--sb-dim)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+      </span>
+      <span class="nm">Chat</span></a>`,
+    '<div class="sb-label">Classes</div>'];
+  for (const c of state.classes) {
+    const week = state.deadlines.filter(d => !d.dismissed && !d.done && d.class_slug === c.slug && d.days_until !== null && d.days_until >= 0 && d.days_until <= 7).length;
+    items.push(`<a class="nav-item ${r.view === 'class' && r.slug === c.slug ? 'active' : ''}" href="#/class/${encodeURIComponent(c.slug)}/overview">
+      <span class="chip" style="${chipStyle(c.slug)}">${esc(initials(c.name))}</span>
+      <span class="nm">${esc(c.name)}</span>
+      ${week ? `<span class="nbadge">${week}</span>` : ''}</a>`);
+  }
+  $('nav').innerHTML = items.join('');
+}
+
+/* ---------- deadline grouping ---------- */
+// Anything further back than this stops being "overdue" and becomes semester
+// sediment, collapsed into its own section. Brightspace marks almost nothing
+// off, so without a floor the board is one permanent wall of red by
+// November — measured at 285 rows in a week-15 simulation. Same number as
+// briefing.OVERDUE_FLOOR_DAYS, deliberately.
+const STALE_AFTER_DAYS = 21;
+
+function groupDeadlines(items) {
+  const g = { overdue: [], today: [], week: [], later: [], stale: [], done: [] };
+  for (const d of items) {
+    if (d.done) { g.done.push(d); continue; }
+    if (d.days_until === null || d.days_until === undefined) { g.later.push(d); continue; }
+    if (d.days_until < -STALE_AFTER_DAYS) g.stale.push(d);
+    else if (d.days_until < 0) g.overdue.push(d);
+    else if (d.days_until === 0) g.today.push(d);
+    else if (d.days_until <= 7) g.week.push(d);
+    else g.later.push(d);
+  }
+  return g;
+}
+function drowHTML(d, showClass) {
+  const check = `<button class="dcheck ${d.done ? 'on' : ''}" title="${d.done ? 'Mark not done' : 'Mark done'}"
+    data-slug="${esc(d.class_slug)}" data-uid="${esc(d.uid)}" data-done="${d.done ? '1' : ''}"
+    onclick="toggleDone(this)">&#10003;</button>`;
+  // safeUrl, not d.link — a javascript: link must render as plain text, not
+  // as an anchor with an empty href (which reloads the page).
+  const title = safeUrl(d.link)
+    ? `<a class="t" href="${esc(safeUrl(d.link))}" target="_blank" rel="noopener noreferrer">${esc(d.title)}</a>`
+    : `<span class="t">${esc(d.title)}</span>`;
+  return `<div class="drow">${check}${badge(d.days_until)}${title}
+    ${showClass ? `<span class="cls">${esc(d.class_name)}</span>` : ''}
+    ${worthLabel(d) ? `<span class="worth ${orderWeight(d) >= 10 ? 'big' : ''}" title="${esc(d.impact.component || '')}">${esc(worthLabel(d))}</span>` : ''}
+    <span class="when">${fmtDue(d.due)}</span>
+    <button class="quiet dx" title="Clear from board (restorable)" data-slug="${esc(d.class_slug)}" data-uid="${esc(d.uid)}" onclick="dismissDeadline(this)">&times;</button></div>`;
+}
+
+function clearedRowHTML(d, showClass) {
+  return `<div class="drow cleared-row"><span class="t">${esc(d.title)}</span>
+    ${showClass ? `<span class="cls">${esc(d.class_name)}</span>` : ''}
+    <span class="when">${fmtDue(d.due)}</span>
+    <button class="quiet" data-slug="${esc(d.class_slug)}" data-uid="${esc(d.uid)}" onclick="restoreDeadline(this)">Restore</button></div>`;
+}
+function deadlineGroupsHTML(items, showClass, cleared = []) {
+  const clearedBlock = cleared.length
+    ? `<details class="cleared"><summary>Cleared from board · ${cleared.length}</summary>${cleared.map(d => clearedRowHTML(d, showClass)).join('')}</details>`
+    : '';
+  if (!items.length) {
+    return `<div class="empty"><div class="eic">${IC.cal}</div><p>No deadlines synced yet. They'll appear here automatically once a calendar feed is connected.</p></div>` + clearedBlock;
+  }
+  const g = groupDeadlines(items);
+  let html = '';
+  const section = (label, arr, cls) => arr.length ? `<div class="dgroup"><div class="dgroup-label ${cls || ''}">${label}</div>${arr.map(d => drowHTML(d, showClass)).join('')}</div>` : '';
+  html += section(`Overdue · ${g.overdue.length}`, g.overdue, 'overdue');
+  if (g.stale.length) {
+    html += `<details class="cleared"><summary>Earlier in the semester · ${g.stale.length}</summary>
+      <p class="hint" style="margin:6px 0 2px">Never marked off in Brightspace. Tick what you handed in, or clear what was never really a deadline — either way it stops showing as overdue.</p>
+      ${g.stale.map(d => drowHTML(d, showClass)).join('')}</details>`;
+  }
+  html += section('Today', g.today);
+  html += section('This week', g.week);
+  if (g.later.length) {
+    const shown = showAllLater ? g.later : g.later.slice(0, 8);
+    html += section(`Later · ${g.later.length}`, shown);
+    if (g.later.length > 8) {
+      html += `<button class="quiet show-more" onclick="showAllLater=!showAllLater;render()">${showAllLater ? 'Show fewer' : `Show all ${g.later.length}`}</button>`;
+    }
+  }
+  if (g.done.length) {
+    html += `<details class="cleared"><summary>Done · ${g.done.length}</summary>` +
+      g.done.map(d => `<div class="done-row">${drowHTML(d, showClass)}</div>`).join('') + '</details>';
+  }
+  return html + clearedBlock;
+}
+
+/* ---------- overview ---------- */
+function overviewHTML() {
+  const today = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  const actD = state.deadlines.filter(d => !d.dismissed);
+  const clearedD = state.deadlines.filter(d => d.dismissed);
+  // Matches the board: anything older than the floor lives in "earlier in
+  // the semester", so counting it here would contradict what's shown.
+  const overdue = actD.filter(d => !d.done && d.days_until !== null && d.days_until < 0 && d.days_until >= -STALE_AFTER_DAYS).length;
+  const week = actD.filter(d => !d.done && d.days_until !== null && d.days_until >= 0 && d.days_until <= 7).length;
+  const docs = Object.values(state.materials).reduce((n, arr) => n + arr.length, 0);
+  return `<div class="page">
+    ${state.configError ? `<div class="banner"><b>There's a problem with your class config file</b>${esc(state.configError)}</div>` : ''}
+    <div class="page-head">
+      <div class="kicker">${esc(today)}</div>
+      <h1>Overview</h1>
+      <div class="sub">Everything across your ${state.classes.length} classes, in one place.</div>
+    </div>
+    <div class="statgrid">
+      <div class="stat ${overdue ? 'alert' : ''}"><div class="n">${overdue}</div><div class="l">Overdue</div></div>
+      <div class="stat"><div class="n">${week}</div><div class="l">Due this week</div></div>
+      <div class="stat"><div class="n">${state.due.length}</div><div class="l">Cards to review</div></div>
+      <div class="stat"><div class="n">${docs}</div><div class="l">Documents</div></div>
+    </div>
+    <div class="cardgrid">
+    ${(() => {
+      const rows = state.classes.map(c => ({ c, g: state.grades[c.slug] }))
+        .filter(x => x.g && x.g.summary && x.g.summary.current_pct !== null);
+      if (!rows.length) return '';
+      return `<section class="card span2">
+        <div class="card-head"><h2>Where you stand</h2><span class="count">${rows.length} of ${state.classes.length} classes</span></div>
+        ${rows.sort((a, b) => a.g.summary.current_pct - b.g.summary.current_pct).map(({ c, g }) => `
+          <a class="standing" href="#/class/${encodeURIComponent(c.slug)}" style="text-decoration:none;color:inherit">
+            <span class="chip" style="${chipStyle(c.slug)};width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">${esc(initials(c.name))}</span>
+            <span class="nm">${esc(c.name)}</span>
+            <span class="muted">${fmtPct(g.summary.remaining_weight)}% still in play</span>
+            <span class="pct">${fmtPct(g.summary.current_pct)}% ${esc(g.summary.current_letter || '')}</span>
+          </a>`).join('')}
+      </section>`;
+    })()}
+    <section class="card span2">
+      <div class="card-head"><h2>Briefing</h2>
+        ${state.briefing ? `<span class="count" id="brief-progress"></span>
+          <span class="count">${briefingAge(state.briefing.generated_at)}${state.briefing.used_model ? '' : ' · plain digest (no model)'}</span>` : ''}
+        <div class="right"><button id="brief-btn" onclick="refreshBriefing()">${state.briefing ? 'Refresh' : 'Generate'}</button></div></div>
+      ${state.briefing
+        ? `<div class="brief-body">${briefingBody(state.briefing.content)}</div>`
+        : `<div class="empty"><div class="eic">${IC.compass}</div><p>Your daily study briefing lands here — a scan of every deadline, syllabus topic, document, and review session, refreshed automatically about once a day while the app runs. Generate the first one now.</p></div>`}
+      <div id="brief-msg" class="error-msg"></div>
+    </section>
+
+    <section class="card span2">
+      <div class="card-head"><h2>Deadlines</h2><span class="count">${actD.length} synced</span></div>
+      ${deadlineGroupsHTML(actD, true, clearedD)}
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Review queue</h2><span class="count">${state.due.length} due</span></div>
+      ${state.due.length
+        ? state.due.slice(0, 3).map(c => `<div class="drow"><span class="t">${esc(c.question)}</span><span class="cls">${esc(c.class_name)}</span>
+            <a href="#/class/${encodeURIComponent(c.class_slug)}"><button class="quiet">Open</button></a></div>`).join('')
+          + (state.due.length > 3 ? `<div class="muted" style="padding-top:8px">…and ${state.due.length - 3} more — open a class to review.</div>` : '')
+        : `<div class="empty"><div class="eic">${IC.cards}</div><p>Nothing due for review. Open a class and generate questions from your documents to build a study deck.</p></div>`}
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Recent activity</h2></div>
+      <div class="activity">${state.activity.length ? state.activity.map(a => `<div>${esc(a)}</div>`).join('') : '<div class="muted">Nothing yet.</div>'}</div>
+    </section>
+    </div>
+  </div>`;
+}
+
+/* ---------- grades ---------- */
+function gradesCardHTML(c) {
+  const g = state.grades[c.slug];
+  const sch = g && g.scheme ? g.scheme : { components: [] };
+  const sum = g ? g.summary : null;
+  const hasScheme = sch.components && sch.components.length;
+
+  if (!hasScheme) {
+    return `<section class="card span2">
+      <div class="card-head"><h2>Grade</h2>
+        <div class="right"><button onclick="extractScheme(${jsArg(c.slug)}, this)">Read grading from syllabus</button></div></div>
+      <div class="empty"><div class="eic">${IC.cards}</div>
+        <p>No grading scheme yet. Upload this class's syllabus to Documents, then click above — it pulls the weights, exam dates, and late policy out for you to confirm. Without this the app can only sort by due date, which can't tell a 1% post from a 20% midterm.</p></div>
+      <div id="grade-msg-${esc(c.slug)}" class="error-msg"></div>
+    </section>`;
+  }
+
+  const targets = (g.targets || []).filter(t => t.needed_pct !== null && t.needed_pct !== undefined);
+  const graded = sum.graded_weight || 0;
+  return `<section class="card span2">
+    <div class="card-head"><h2>Grade</h2>
+      ${sum.scheme_confirmed ? '' : '<span class="unconfirmed">unconfirmed weights</span>'}
+      <div class="right">
+        ${sum.scheme_confirmed ? '' : `<button class="primary" onclick="confirmScheme(${jsArg(c.slug)})">Looks right</button>`}
+        <button class="quiet" onclick="extractScheme(${jsArg(c.slug)}, this)">Re-read syllabus</button>
+      </div></div>
+
+    <div class="gradehead">
+      ${sum.current_pct !== null
+        ? `<span class="gradebig">${fmtPct(sum.current_pct)}%</span><span class="gradeletter">${esc(sum.current_letter || '')}</span>
+           <span class="muted">on the ${fmtPct(graded)}% of your grade decided so far · ${fmtPct(sum.remaining_weight)}% still in play</span>`
+        : `<span class="muted">No scores entered yet — add one below and this becomes your live standing.</span>`}
+    </div>
+    ${graded ? `<div class="bar"><i style="width:${Math.min(100, graded)}%"></i></div>` : ''}
+
+    ${(sum.orphaned || []).map(o => `<div class="orphan-warn" style="margin-top:14px">
+      <b>${o.count} score${o.count === 1 ? '' : 's'} filed under “${esc(o.component)}” aren't counting.</b>
+      That category isn't in your grading scheme any more — usually a rename, or a re-run of syllabus
+      extraction that came back with different names. They're being ignored, which is quietly moving
+      your grade. Move them to:
+      <div class="row wrap" style="margin-top:8px;gap:6px">
+        ${sch.components.map(x => `<button class="quiet" style="font-size:12px"
+          onclick="reassignScores(${jsArg(c.slug)}, ${jsArg(o.component)}, ${jsArg(x.name)})">${esc(x.name)}</button>`).join('')}
+      </div></div>`).join('')}
+
+    <div style="margin-top:16px">
+      ${sum.components.map(p => `<div class="comp-row">
+        <span class="nm">${esc(p.name)}</span>
+        <span class="w">${fmtPct(p.weight_pct)}% of grade${p.total_items ? ` · ${p.graded_items}/${p.total_items} in` : (p.graded_items ? ` · ${p.graded_items} in` : '')}</span>
+        <span class="pct">${p.graded_items ? fmtPct(p.fraction) + '%' : '—'}</span>
+      </div>`).join('')}
+      ${Math.abs((sum.scheme_total_weight || 0) - 100) > 0.5
+        ? `<div class="hint" style="color:var(--warn)">These weights add up to ${fmtPct(sum.scheme_total_weight)}%, not 100% — worth double-checking against the syllabus.</div>` : ''}
+    </div>
+
+    ${targets.length && sum.current_pct !== null ? `<div style="margin-top:16px">
+      <label>What you need on the remaining ${fmtPct(sum.remaining_weight)}%</label>
+      ${targets.map(t => `<div class="target-row ${t.possible ? '' : 'unreachable'}">
+        <span class="l">${esc(t.letter)}</span>
+        <span class="need">${t.already_secured ? 'already secured' : (t.possible ? `needs ${fmtPct(t.needed_pct)}% average` : 'out of reach')}</span>
+      </div>`).join('')}
+    </div>` : ''}
+
+    <details style="margin-top:16px">
+      <summary style="cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-dim)">Add a score</summary>
+      <div class="row wrap" style="margin-top:10px;align-items:flex-end;gap:10px">
+        <div class="field" style="flex:1;min-width:130px;margin:0"><label>Category</label>
+          <select id="sc-comp-${esc(c.slug)}">${sch.components.map(x => `<option>${esc(x.name)}</option>`).join('')}</select></div>
+        <div class="field" style="flex:1;min-width:120px;margin:0"><label>What</label>
+          <input id="sc-name-${esc(c.slug)}" placeholder="HW 3"></div>
+        <div class="field" style="width:90px;margin:0"><label>Earned</label>
+          <input id="sc-earned-${esc(c.slug)}" type="number" step="any" placeholder="18"></div>
+        <div class="field" style="width:90px;margin:0"><label>Out of</label>
+          <input id="sc-poss-${esc(c.slug)}" type="number" step="any" placeholder="20"></div>
+        <button class="primary" onclick="addScore(${jsArg(c.slug)})">Add</button>
+      </div>
+      <div id="score-err-${esc(c.slug)}" class="error-msg"></div>
+      ${(g.scores || []).length ? `<div style="margin-top:12px">${g.scores.map((s, i) => `<div class="comp-row">
+        <span class="nm">${esc(s.name)}</span><span class="w">${esc(s.component)}</span>
+        <span class="pct">${fmtPct(s.earned)}/${fmtPct(s.possible)}</span>
+        <button class="quiet" style="font-size:12px" onclick="deleteScore(${jsArg(c.slug)}, ${i})">Remove</button>
+      </div>`).join('')}</div>` : ''}
+    </details>
+    <div id="grade-msg-${esc(c.slug)}" class="error-msg"></div>
+  </section>`;
+}
+
+async function extractScheme(slug, btn) {
+  const msg = $('grade-msg-' + slug);
+  btn.disabled = true; btn.textContent = 'Reading syllabus…'; if (msg) msg.textContent = '';
+  try {
+    await api(`/api/grades/${slug}/extract`, { method: 'POST' });
+    await refresh();
+  } catch (e) {
+    if (msg) msg.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Read grading from syllabus';
+  }
+}
+
+async function confirmScheme(slug) {
+  const g = state.grades[slug];
+  if (!g) return;
+  await api(`/api/grades/${slug}/scheme`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ ...g.scheme, confirmed: true }) });
+  await refresh();
+}
+
+async function addScore(slug) {
+  const err = $('score-err-' + slug);
+  err.textContent = '';
+  const body = {
+    component: $('sc-comp-' + slug).value,
+    name: $('sc-name-' + slug).value.trim(),
+    earned: $('sc-earned-' + slug).value,
+    possible: $('sc-poss-' + slug).value,
+  };
+  try {
+    await api(`/api/grades/${slug}/scores`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+    await refresh();
+  } catch (e) { err.textContent = e.message; }
+}
+
+async function deleteScore(slug, index) {
+  await api(`/api/grades/${slug}/scores`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ delete_index: index }) });
+  await refresh();
+}
+
+/* ---------- class workspace ---------- */
+const CLASS_TABS = [
+  { id: 'overview', t: 'Overview' },
+  { id: 'work', t: 'Work' },
+  { id: 'study', t: 'Study' },
+  { id: 'grade', t: 'Grade' },
+  { id: 'files', t: 'Files' },
+];
+
+function classStats(c) {
+  const mineAll = state.deadlines.filter(d => d.class_slug === c.slug);
+  const mine = mineAll.filter(d => !d.dismissed && !d.done);
+  return {
+    all: mineAll,
+    open: mine,
+    cleared: mineAll.filter(d => d.dismissed),
+    overdue: mine.filter(d => d.days_until !== null && d.days_until < 0 && d.days_until >= -STALE_AFTER_DAYS),
+    week: mine.filter(d => d.days_until !== null && d.days_until >= 0 && d.days_until <= 7),
+    next: mine.filter(d => d.days_until !== null && d.days_until >= 0)
+              .sort((a, b) => a.days_until - b.days_until)[0],
+    due: state.due.filter(d => d.class_slug === c.slug),
+    mats: state.materials[c.slug] || [],
+    topics: state.topics[c.slug] || [],
+    deck: state.deck[c.slug] || [],
+    g: state.grades[c.slug],
+  };
+}
+
+function classHTML(c, tab) {
+  const s = classStats(c);
+  const meta = [c.term, c.instructor].filter(Boolean).join(' · ');
+  const g = s.g && s.g.summary ? s.g.summary : null;
+  const gradeStat = g && g.current_pct !== null
+    ? `${fmtPct(g.current_pct)}%<span style="font-size:14px;color:var(--ink-dim);font-weight:600"> ${esc(g.current_letter || '')}</span>`
+    : '—';
+  const nextStat = s.next ? (s.next.days_until === 0 ? 'today' : `${s.next.days_until}d`) : '—';
+
+  return `<div class="page">
+    <div class="class-hero">
+      <div class="bigchip" style="${chipStyle(c.slug)}">${esc(initials(c.name))}</div>
+      <div style="min-width:0;flex:1">
+        <h1>${esc(c.name)}</h1>
+        <div class="sub">${meta ? esc(meta) : 'No term or instructor set'}</div>
+      </div>
+      <button class="primary" onclick="startFocus(event, ${jsArg(c.slug)}, ${s.due.length ? "'review'" : "'assignment'"}, ${s.due.length ? 'null' : (s.next ? `'${esc(s.next.uid)}'` : 'null')})">Focus on this class</button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hstat ${s.overdue.length ? 'alert' : ''}"><div class="n">${s.overdue.length}</div><div class="l">Overdue</div></div>
+      <div class="hstat"><div class="n">${nextStat}</div><div class="l">Next due</div></div>
+      <div class="hstat"><div class="n">${s.due.length}</div><div class="l">Cards due</div></div>
+      <div class="hstat"><div class="n">${gradeStat}</div><div class="l">Current grade</div></div>
+      <div class="hstat"><div class="n">${s.mats.length}</div><div class="l">Documents</div></div>
+    </div>
+
+    <div class="subtabs">
+      ${CLASS_TABS.map(t => `<a href="#/class/${encodeURIComponent(c.slug)}/${t.id}" class="${t.id === tab ? 'on' : ''}">${esc(t.t)}${
+        t.id === 'work' && s.overdue.length ? ` <span class="tabdot">${s.overdue.length}</span>` :
+        t.id === 'study' && s.due.length ? ` <span class="tabdot">${s.due.length}</span>` : ''}</a>`).join('')}
+    </div>
+
+    ${tab === 'work' ? tabWork(c, s)
+      : tab === 'study' ? tabStudy(c, s)
+      : tab === 'grade' ? tabGrade(c, s)
+      : tab === 'files' ? tabFiles(c, s)
+      : tabOverview(c, s)}
+  </div>`;
+}
+
+/* ---- Overview: the at-a-glance answer to "where am I in this class" ---- */
+function tabOverview(c, s) {
+  const upNext = s.open
+    .filter(d => d.days_until !== null)
+    .sort((a, b) => a.days_until - b.days_until)
+    .slice(0, 5);
+  const g = s.g && s.g.summary ? s.g.summary : null;
+  const heaviest = s.open
+    .filter(d => orderWeight(d) > 0)
+    .sort((a, b) => orderWeight(b) - orderWeight(a))[0];
+
+  return `<div class="cardgrid">
+    <section class="card">
+      <div class="card-head"><h2>Up next</h2>
+        <div class="right"><a href="#/class/${encodeURIComponent(c.slug)}/work" style="font-size:12.5px">All ${s.open.length} &rarr;</a></div></div>
+      ${upNext.length ? upNext.map(d => drowHTML(d, false)).join('')
+        : `<div class="empty"><div class="eic">${IC.cal}</div><p>Nothing scheduled. Either you're clear, or this class has no calendar feed connected.</p></div>`}
+      ${heaviest ? `<div class="callout" style="margin-top:14px">Biggest thing ahead: <b>${esc(heaviest.title)}</b> — ${esc(worthLabel(heaviest))} of your grade.</div>` : ''}
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Standing</h2>
+        <div class="right"><a href="#/class/${encodeURIComponent(c.slug)}/grade" style="font-size:12.5px">Details &rarr;</a></div></div>
+      ${g && g.current_pct !== null ? `
+        <div class="gradehead"><span class="gradebig">${fmtPct(g.current_pct)}%</span><span class="gradeletter">${esc(g.current_letter || '')}</span></div>
+        <div class="bar"><i style="width:${Math.min(100, g.graded_weight)}%"></i></div>
+        <p class="muted" style="margin-top:10px">${fmtPct(g.graded_weight)}% of your grade is decided · ${fmtPct(g.remaining_weight)}% still in play</p>
+        ${(s.g.targets || []).filter(t => t.possible && !t.already_secured).slice(0, 3).map(t =>
+          `<div class="target-row"><span class="l">${esc(t.letter)}</span><span class="need">needs ${fmtPct(t.needed_pct)}% on the rest</span></div>`).join('')}
+      ` : `<div class="empty"><div class="eic">${IC.cards}</div><p>No grade tracking set up yet. Upload the syllabus, then let the Grade tab read the weights out of it.</p></div>`}
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Read ahead</h2></div>
+      ${s.topics.length ? s.topics.slice(0, 5).map((t, i) => `
+        <div class="topic-row"><span class="t">${esc(t.topic)} <span class="muted">${esc(t.date)}</span></span>
+          <button class="quiet" onclick="summarize(${jsArg(c.slug)}, this, ${i})" data-topic="${esc(t.topic)}">Read ahead</button></div>
+        <div class="topic-summary" id="ts-${i}"></div>`).join('')
+        : `<div class="empty"><div class="eic">${IC.compass}</div><p>No syllabus topics on file. Add dated topics under <code>topics:</code> for this class in <code>config/classes.yaml</code> to get one-click pre-reading from your own material.</p></div>`}
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Quick actions</h2></div>
+      <div class="row wrap">
+        <button onclick="startFocus(event, ${jsArg(c.slug)}, 'review', null)">Review ${s.due.length} card${s.due.length === 1 ? '' : 's'}</button>
+        <button onclick="location.hash = '#/class/${encodeURIComponent(c.slug)}/files'">Add material</button>
+        ${s.next ? `<button onclick="startFocus(event, ${jsArg(c.slug)}, 'assignment', ${jsArg(s.next.uid)})">Work on ${esc(s.next.title.slice(0, 28))}${s.next.title.length > 28 ? '…' : ''}</button>` : ''}
+      </div>
+      <p class="muted" style="margin-top:12px">${s.mats.length ? `${s.mats.length} document${s.mats.length === 1 ? '' : 's'} on file, ${s.deck.length} flashcard${s.deck.length === 1 ? '' : 's'} in the deck.` : 'Nothing uploaded yet — the quiz, read-ahead, and drafting features all read from your documents.'}</p>
+    </section>
+  </div>`;
+}
+
+/* ---- Work: every deadline, plus saved drafts ---- */
+function tabWork(c, s) {
+  return `<div class="cardgrid">
+    <section class="card span2">
+      <div class="card-head"><h2>Deadlines</h2><span class="count">${s.open.length} open</span></div>
+      ${deadlineGroupsHTML(s.open.concat(s.all.filter(d => d.done && !d.dismissed)), false, s.cleared)}
+    </section>
+    <section class="card span2">
+      <div class="card-head"><h2>Draft something</h2>
+        <div class="right"><button class="quiet" onclick="loadDrafts(${jsArg(c.slug)})">Show saved drafts</button></div></div>
+      <div class="row wrap" style="align-items:flex-start;gap:16px">
+        <div style="flex:1;min-width:260px">
+          <div class="field"><label>What do you need?</label>
+            <textarea id="draft-prompt" rows="3" placeholder="e.g. A 500-word response on how the first law applies to open systems — or brainstorm 5 angles for my project proposal."></textarea></div>
+          <div class="field" style="max-width:260px"><label>Save as <span style="text-transform:none;font-weight:500">(optional)</span></label>
+            <input id="draft-slug" placeholder="essay-1"></div>
+          <button class="primary" onclick="requestDraft(${jsArg(c.slug)})">Generate draft</button>
+          <div id="draft-err" class="error-msg"></div>
+        </div>
+        <div style="flex:1.2;min-width:280px">
+          <div id="drafts-list"></div>
+          <div class="draft-out" id="draft-out">
+            <span class="draft-tag">DRAFT — verify this assignment's AI-use policy before submitting</span>
+            <div class="draft-body" id="draft-body"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>`;
+}
+
+/* ---- Study: modes, cards due, generation, and the full deck ---- */
+function tabStudy(c, s) {
+  return `<div class="cardgrid">
+    <section class="card span2">
+      <div class="card-head"><h2>How to study this</h2>
+        <div class="right"><button class="quiet" style="font-size:12px" onclick="loadStudy(${jsArg(c.slug)})">Refresh</button></div>
+      </div>
+      <div id="study-modes"><p class="muted">Loading…</p></div>
+    </section>
+
+    <section class="card span2">
+      <div class="card-head"><h2>What are you stuck on?</h2>
+        <div class="right"><button class="quiet" style="font-size:12px" onclick="loadLadders(${jsArg(c.slug)})">Refresh</button></div>
+      </div>
+      <p class="lede" style="margin-top:-4px">Say it in your own words and it builds problems around it — the first one fully worked, then handing more of it to you each time you get one right, until you're solving them cold.</p>
+      <div id="ladders"><p class="muted">Loading…</p></div>
+    </section>
+
+    <section class="card span2">
+      <div class="card-head"><h2>Due for review</h2><span class="count">${s.due.length}</span>
+        <div class="right">
+          ${s.due.length ? `<button class="primary" onclick="startFocus(event, ${jsArg(c.slug)}, 'review', null)">Review in focus mode</button>` : ''}
+          <button id="gen-btn" onclick="generateQuestions(${jsArg(c.slug)})">Generate questions</button>
+        </div></div>
+      <div id="study-area">
+      ${s.due.length ? s.due.map(card => `<div class="qcard" data-card="${esc(card.card_id)}">
+        <div class="q">${esc(card.question)}</div>
+        <div class="a" style="display:none">${esc(card.answer)}</div>
+        <div class="row" style="gap:6px">
+          <button class="quiet" onclick="reveal(this)">Reveal answer</button>
+          <button class="quiet" style="margin-left:auto;font-size:12px" data-slug="${esc(c.slug)}" data-card="${esc(card.card_id)}"
+            data-q="${esc(card.question)}" data-a="${esc(card.answer)}" onclick="editCard(this)">Edit</button>
+          <button class="quiet" style="font-size:12px" data-slug="${esc(c.slug)}" data-card="${esc(card.card_id)}" onclick="deleteCard(this)">Delete</button>
+        </div>
+        <div class="rate-row" style="display:none">
+          <button onclick="rate(${jsArg(c.slug)},${jsArg(card.card_id)},'again')">Again</button>
+          <button onclick="rate(${jsArg(c.slug)},${jsArg(card.card_id)},'hard')">Hard</button>
+          <button onclick="rate(${jsArg(c.slug)},${jsArg(card.card_id)},'good')">Good</button>
+          <button class="primary" onclick="rate(${jsArg(c.slug)},${jsArg(card.card_id)},'easy')">Easy</button>
+        </div></div>`).join('')
+      : `<div class="empty"><div class="eic">${IC.cards}</div><p>${s.mats.some(m => m.extracted)
+          ? 'Nothing due right now. That means you are caught up, not that something broke — generate more questions to grow the deck.'
+          : 'Upload a reading or your notes under Files first, then generate questions from it. Cards always come from your own material.'}</p></div>`}
+      </div>
+      <div id="gen-msg" class="muted" style="display:none;margin-top:10px"></div>
+    </section>
+
+    <section class="card span2">
+      <div class="card-head"><h2>Full deck</h2><span class="count">${s.deck.length} card${s.deck.length === 1 ? '' : 's'}</span></div>
+      ${s.deck.length ? s.deck.map(card => `<div class="deck-row">
+          <span class="q">${esc(card.question)}</span>
+          ${card.due ? '<span class="worth">due</span>' : ''}
+          <button class="quiet" style="font-size:12px" data-slug="${esc(c.slug)}" data-card="${esc(card.card_id)}"
+            data-q="${esc(card.question)}" data-a="${esc(card.answer)}" onclick="editCard(this)">Edit</button>
+          <button class="quiet" style="font-size:12px" data-slug="${esc(c.slug)}" data-card="${esc(card.card_id)}" onclick="deleteCard(this)">Delete</button>
+        </div>`).join('')
+        : `<div class="empty"><p>No cards yet.</p></div>`}
+      ${s.deck.length ? `<p class="hint">If a generated card is wrong, delete it rather than rating it "Again" — rating it wrong tells the scheduler to show it to you <em>more</em> often.</p>` : ''}
+    </section>
+  </div>`;
+}
+
+/* ---- Grade: the full ledger ---- */
+function tabGrade(c, s) {
+  return `<div class="cardgrid">${gradesCardHTML(c)}</div>`;
+}
+
+/* ---- Files: documents in, documents out ---- */
+function tabFiles(c, s) {
+  const readable = s.mats.filter(m => m.extracted).length;
+  return `<div class="cardgrid">
+    <section class="card span2">
+      <div class="card-head"><h2>Documents</h2><span class="count">${s.mats.length} file${s.mats.length === 1 ? '' : 's'}${s.mats.length ? ` · ${readable} readable` : ''}</span></div>
+      <div id="doc-list">
+      ${s.mats.length ? s.mats.map(m => `<div class="doc-row">
+          <div class="ic">${IC.doc}</div>
+          <span class="nm">${esc(m.filename)}</span>
+          ${m.char_count ? `<span class="muted">${Math.round(m.char_count / 1000)}k chars</span>` : ''}
+          ${m.extracted ? '' : '<span class="flag">no text — not searchable</span>'}
+          <button class="quiet del" onclick="deleteDoc(${jsArg(c.slug)}, ${jsArg(m.relpath)}, this)">Delete</button>
+        </div>`).join('')
+        : `<div class="empty"><div class="eic">${IC.doc}</div><p>Nothing filed yet. Studying and the chat work without this — the model already knows the subject. What your files add is <em>fit</em>: your professor's notation and conventions, plus the things only your course can answer — your grade weights, exam dates, and quiz questions drawn from what was actually taught.</p></div>`}
+      </div>
+      <div class="dropzone" id="dz" onclick="$('file-in').click()">
+        Drop files here or click to upload — syllabus, readings, notes, homework
+        <input type="file" id="file-in" multiple style="display:none">
+      </div>
+      <details class="paste">
+        <summary>Or paste text directly</summary>
+        <div class="field"><input id="paste-title" placeholder="What is this? e.g. Week 3 lecture notes (optional)"></div>
+        <div class="field"><textarea id="paste-text" rows="4" placeholder="Paste a syllabus, notes, a reading — the same way you'd paste it into a chat."></textarea></div>
+        <button onclick="pasteDoc(${jsArg(c.slug)})">Add pasted text</button>
+        <div id="paste-err" class="error-msg"></div>
+      </details>
+      <p class="hint">Start with the syllabus — it's what lets the Grade tab work out your weights automatically.</p>
+    </section>
+  </div>`;
+}
+
+/* ---------- study modes ----------
+   Six kinds of study session, not six "learner types" — the popular idea
+   that people are visual/auditory/kinesthetic learners and should be taught
+   in their type is one of the most tested and least supported claims in
+   education research. What holds up is that the right TECHNIQUE depends on
+   the material and on how well you already know it, which is what the
+   recommendation reads off your actual state. See study.py.               */
+
+const studyUI = { modes: null, slug: null, data: null, mode: null, session: null, busy: false, error: '' };
+
+async function loadStudy(slug) {
+  const el = $('study-modes');
+  if (!el) return;
+  studyUI.slug = slug; studyUI.error = '';
+  try {
+    if (!studyUI.modes) studyUI.modes = await api('/api/study/modes');
+    studyUI.data = await api('/api/study/' + slug);
+    // Follow the suggestion until the student picks for themselves — without
+    // this, starting a ladder left the picker highlighting whatever was
+    // suggested a minute ago, disagreeing with the banner above it.
+    if (studyUI.lastSlug !== slug) { studyUI.picked = false; studyUI.session = null; }
+    if (!studyUI.picked) studyUI.mode = studyUI.data.active_mode;
+    studyUI.lastSlug = slug;
+  } catch (e) { el.innerHTML = `<p class="error-msg">${esc(e.message)}</p>`; return; }
+  renderStudy();
+}
+
+function pickMode(key) { studyUI.mode = key; studyUI.picked = true; studyUI.session = null; studyUI.error = ''; renderStudy(); }
+
+function renderStudy() {
+  const el = $('study-modes');
+  if (!el || !studyUI.data) return;
+  const d = studyUI.data, st = d.state || {}, cur = studyUI.modes.find(m => m.key === studyUI.mode) || studyUI.modes[0];
+  const pinned = d.pinned_mode;
+
+  const grid = studyUI.modes.map(m => `<button class="mode-b ${m.key === studyUI.mode ? 'on' : ''}"
+      onclick="pickMode(${jsArg(m.key)})">
+      ${m.key === d.recommended ? '<span class="star">SUGGESTED</span>' : (m.key === pinned ? '<span class="star">PINNED</span>' : '')}
+      <span class="mn">${esc(m.label)}</span><span class="mb">${esc(m.blurb)}</span></button>`).join('');
+
+  // Flashcards are scheduled by FSRS and already have their own card below,
+  // so the mode picker hands off rather than duplicating the review UI.
+  const runner = cur.key === 'recall'
+    ? `<p class="mode-when">Flashcards run on their own schedule — <b>${st.due_card_count || 0} card${st.due_card_count === 1 ? '' : 's'} due right now</b>, in the panel below. This is the only mode that tells you when to come back.</p>`
+    : cur.key === 'ladder'
+    ? `<p class="mode-when">${st.open_ladder
+        ? `You have one going on <b>${esc(st.open_ladder)}</b> — it's in <b>What are you stuck on?</b> just below.`
+        : 'Name what keeps costing you marks in <b>What are you stuck on?</b> just below, and it builds the progression from your own material.'}</p>`
+    : `<div class="field" style="margin-top:14px">
+        <label>Topic</label>
+        <input id="sm-topic" placeholder="e.g. entropy generation, method of joints, chain rule"
+          value="${esc(studyUI.topic || '')}" oninput="studyUI.topic = this.value">
+       </div>
+       ${cur.asks_for_input ? `<div class="field">
+          <label>Your explanation — write it from memory, then have it checked</label>
+          <textarea id="sm-input" rows="5" placeholder="Explain it as if to someone in the class who missed the lecture. Don't look at your notes; the gaps are the point."
+            oninput="studyUI.input = this.value">${esc(studyUI.input || '')}</textarea>
+        </div>` : ''}
+       <button class="primary" onclick="runStudy()" ${studyUI.busy ? 'disabled' : ''}>
+         ${studyUI.busy ? 'Working…' : (cur.asks_for_input ? 'Check my explanation' : 'Start ' + esc(cur.label.toLowerCase()))}</button>
+       ${pinned === cur.key
+         ? `<button class="quiet" style="margin-left:8px" onclick="pinMode('')">Unpin</button>`
+         : `<button class="quiet" style="margin-left:8px" onclick="pinMode(${jsArg(cur.key)})">Always start here</button>`}`;
+
+  el.innerHTML = `
+    <div class="mode-rec"><span class="rk">Suggested</span>
+      <span class="rtx">${esc(d.reason)}</span></div>
+    <div class="mode-grid">${grid}</div>
+    <p class="mode-when"><b>${esc(cur.label)} —</b> ${esc(cur.when)}</p>
+    ${runner}
+    ${studyUI.error ? `<p class="error-msg">${esc(studyUI.error)}</p>` : ''}
+    <div class="study-out">${studyUI.session ? renderSession(studyUI.session) : ''}</div>
+    ${(d.sessions || []).length ? `<details class="deck"><summary>Earlier sessions (${d.sessions.length})</summary>${
+      d.sessions.map(x => `<div class="deck-row"><span class="q">${esc(modeLabel(x.mode))} · ${esc(x.topic)}</span>
+        <span class="muted" style="font-size:11.5px">${esc((x.created_at || '').slice(0, 10))}</span>
+        <button class="quiet" style="font-size:12px" onclick="openStudySession(${jsArg(studyUI.slug)},${jsArg(x.session_id)})">Open</button></div>`).join('')
+    }</details>` : ''}`;
+}
+
+function modeLabel(key) {
+  const m = (studyUI.modes || []).find(x => x.key === key);
+  return m ? m.label : key;
+}
+
+async function pinMode(key) {
+  try { await postJSON(`/api/study/${studyUI.slug}/pin`, { mode: key }); } catch (e) { studyUI.error = e.message; }
+  await loadStudy(studyUI.slug);
+}
+
+async function openStudySession(slug, id) {
+  try { studyUI.session = await api(`/api/study/${slug}/session/${id}`); studyUI.mode = studyUI.session.mode; }
+  catch (e) { studyUI.error = e.message; }
+  renderStudy();
+}
+
+async function runStudy() {
+  studyUI.busy = true; studyUI.error = ''; studyUI.session = null; renderStudy();
+  try {
+    studyUI.session = await postJSON(`/api/study/${studyUI.slug}/start`, {
+      mode: studyUI.mode, topic: studyUI.topic || '', student_input: studyUI.input || '',
+    });
+  } catch (e) { studyUI.error = e.message; }
+  studyUI.busy = false;
+  try { studyUI.data = await api('/api/study/' + studyUI.slug); } catch (e) { /* keep what we have */ }
+  renderStudy();
+}
+
+/* Each mode gets its own renderer — a study session rendered as a wall of
+   prose is a study session you skim. The shapes come from study.py. */
+function renderSession(sess) {
+  const d = sess.payload || {};
+  const src = (sess.sources || []).length
+    ? `<p class="sx-src">From your material: ${sess.sources.map(esc).join(', ')}</p>` : '';
+  const steps = (arr) => (arr || []).map((x, i) => `<div class="sx-step"><div class="n">${i + 1}</div>
+      <div><div class="act">${esc(x.action || x)}</div>${x.why ? `<div class="why">${esc(x.why)}</div>` : ''}</div></div>`).join('');
+  const given = (arr) => (arr || []).length
+    ? `<div class="sx"><h4>Given</h4>${arr.map(g => `<div class="sx-link">${esc(g)}</div>`).join('')}</div>` : '';
+
+  if (sess.mode === 'worked') return `
+    ${d.title ? `<h3 style="margin:0 0 10px">${esc(d.title)}</h3>` : ''}
+    <div class="sx"><div class="sx-prob">${esc(d.problem)}</div></div>
+    ${given(d.given)}
+    <div class="sx"><h4>Worked through</h4>${steps(d.steps)}</div>
+    ${d.answer ? `<div class="sx"><h4>Answer</h4><div class="sx-prob">${esc(d.answer)}</div></div>` : ''}
+    ${d.key_idea ? `<div class="sx"><div class="sx-note key"><b>The idea that makes it work:</b> ${esc(d.key_idea)}</div></div>` : ''}
+    ${d.common_mistake ? `<div class="sx"><div class="sx-note miss"><b>Where people lose the marks:</b> ${esc(d.common_mistake)}</div></div>` : ''}
+    ${src}`;
+
+  if (sess.mode === 'guided') return `
+    ${d.title ? `<h3 style="margin:0 0 10px">${esc(d.title)}</h3>` : ''}
+    <div class="sx"><div class="sx-prob">${esc(d.problem)}</div></div>
+    ${given(d.given)}
+    <div class="sx"><h4>Hints — open them one at a time</h4>
+      ${(d.hints || []).map((h, i) => `<details class="sx-hint"><summary>Hint ${i + 1}</summary><div class="hb">${esc(h)}</div></details>`).join('')}
+    </div>
+    <details class="sx-hint"><summary>Full solution — try it first</summary><div class="hb">
+      ${steps(d.solution)}
+      ${d.answer ? `<div class="sx-note key" style="margin-top:10px"><b>Answer:</b> ${esc(d.answer)}</div>` : ''}
+      ${d.check ? `<p class="hint">Sanity check: ${esc(d.check)}</p>` : ''}
+    </div></details>
+    ${src}`;
+
+  if (sess.mode === 'explain') return `
+    <div class="row" style="align-items:baseline;gap:14px;margin-bottom:10px">
+      ${typeof d.score_out_of_10 === 'number' ? `<span class="sx-score">${esc(d.score_out_of_10)}<span style="font-size:15px;color:var(--ink-faint)">/10</span></span>` : ''}
+      <span style="font-size:14px;line-height:1.5">${esc(d.verdict)}</span></div>
+    ${(d.correct || []).length ? `<div class="sx"><h4>You had this right</h4>${d.correct.map(x => `<div class="sx-link">${esc(x)}</div>`).join('')}</div>` : ''}
+    ${(d.wrong || []).length ? `<div class="sx"><h4>Wrong</h4>${d.wrong.map(x =>
+      `<div class="sx-qa"><div class="qq">${esc(x.claim)}</div><div class="aa">${esc(x.correction)}</div></div>`).join('')}</div>` : ''}
+    ${(d.missing || []).length ? `<div class="sx"><h4>Left out</h4>${d.missing.map(x =>
+      `<div class="sx-note miss" style="margin-bottom:6px">${esc(x)}</div>`).join('')}</div>` : ''}
+    ${d.probe_question ? `<div class="sx"><div class="sx-note key"><b>Answer this next:</b> ${esc(d.probe_question)}</div></div>` : ''}
+    ${src}`;
+
+  if (sess.mode === 'why') return `
+    <div class="sx">${(d.questions || []).map(q => `<div class="sx-qa">
+      <div class="qq">${esc(q.question)}</div>
+      <details class="sx-hint" style="margin-top:8px"><summary>Answer</summary><div class="hb">${esc(q.answer)}
+        ${q.connects_to ? `<div class="cc">Connects to: ${esc(q.connects_to)}</div>` : ''}</div></details>
+    </div>`).join('')}</div>${src}`;
+
+  if (sess.mode === 'map') return `
+    <div class="sx"><h4>Centre</h4><div class="sx-prob">${esc(d.central)}</div></div>
+    ${(d.nodes || []).length ? `<div class="sx"><h4>Concepts</h4>${d.nodes.map(n =>
+      `<div class="sx-qa"><div class="qq">${esc(n.name)}</div><div class="aa">${esc(n.summary)}</div></div>`).join('')}</div>` : ''}
+    ${(d.links || []).length ? `<div class="sx"><h4>How they connect</h4>${d.links.map(l =>
+      `<div class="sx-link"><span>${esc(l.from)}</span><span class="rel">${esc(l.relationship)}</span><span>${esc(l.to)}</span></div>`).join('')}</div>` : ''}
+    ${(d.equations || []).length ? `<div class="sx"><h4>Equations, and when they hold</h4>${d.equations.map(e =>
+      `<div class="sx-eq"><code>${esc(e.expression)}</code><span class="rel">${esc(e.concept)}</span><span class="vw">${esc(e.valid_when)}</span></div>`).join('')}</div>` : ''}
+    ${src}`;
+
+  if (sess.mode === 'drill') return `
+    <p class="hint" style="margin-bottom:12px">Deliberately mixed — consecutive problems need different methods. It feels worse than doing ten of the same in a row, and it works better, because an exam doesn't tell you which method to use either.</p>
+    <div class="sx">${(d.problems || []).map((q, i) => `<div class="sx-qa">
+      <div class="qq">${i + 1}. ${esc(q.prompt)}</div>
+      <details class="sx-hint" style="margin-top:8px"><summary>Answer</summary><div class="hb">${esc(q.answer)}
+        ${q.method ? `<div class="cc">Method: ${esc(q.method)}</div>` : ''}</div></details>
+    </div>`).join('')}</div>${src}`;
+
+  return `<pre class="muted" style="white-space:pre-wrap">${esc(JSON.stringify(d, null, 2))}</pre>`;
+}
+
+/* ---------- struggle ladders ----------
+   "I struggle with X" turned into a progression whose support fades one
+   piece at a time: watch it done -> you finish it -> you do the hard part
+   -> just the principle -> on your own. The difficulty never changes; only
+   how much of the solution you're handed. See ladder.py.               */
+
+const ladUI = { slug: null, rungs: null, list: [], openId: null, busy: '', err: {}, answer: {}, peeked: {}, last: {} };
+
+async function loadLadders(slug) {
+  const el = $('ladders');
+  if (!el) return;
+  ladUI.slug = slug;
+  try {
+    if (!ladUI.rungs) ladUI.rungs = await api('/api/ladder/rungs');
+    ladUI.list = await api('/api/ladder/' + slug);
+  } catch (e) { el.innerHTML = `<p class="error-msg">${esc(e.message)}</p>`; return; }
+  renderLadders();
+}
+
+function renderLadders() {
+  const el = $('ladders');
+  if (!el) return;
+  const live = ladUI.list.filter(l => !l.graduated_at);
+  const done = ladUI.list.filter(l => l.graduated_at);
+  el.innerHTML = `
+    <div class="lad-new">
+      <div class="field"><input id="lad-in" placeholder="e.g. I keep dropping the sign on moment arms"
+        value="${esc(ladUI.newText || '')}" oninput="ladUI.newText = this.value"
+        onkeydown="if(event.key==='Enter')startLadder()"></div>
+      <button class="primary" onclick="startLadder()" ${ladUI.busy === 'new' ? 'disabled' : ''}>
+        ${ladUI.busy === 'new' ? 'Building…' : 'Build me problems'}</button>
+    </div>
+    ${ladUI.err.new ? `<p class="error-msg">${esc(ladUI.err.new)}</p>` : ''}
+    <div style="margin-top:16px">
+      ${live.length ? live.map(ladderHTML).join('') : (done.length ? '' : `<div class="empty" style="padding:22px 0">
+        <p>Nothing on the go. Name one thing that keeps costing you marks — the more specific, the better the problems. Works with or without documents uploaded.</p></div>`)}
+      ${done.length ? `<details class="deck" style="margin-top:8px"><summary>Finished · ${done.length}</summary>
+        ${done.map(ladderHTML).join('')}</details>` : ''}
+    </div>`;
+}
+
+function ladderHTML(l) {
+  const pr = l.progress || {};
+  const open = ladUI.openId === l.ladder_id;
+  const bars = ladUI.rungs.map((r, i) =>
+    `<div class="rung ${i < pr.rung_index ? 'done' : (i === pr.rung_index ? 'now' : '')}"></div>`).join('');
+  const labels = ladUI.rungs.map((r, i) =>
+    `<span class="${i === pr.rung_index && !l.graduated_at ? 'now' : ''}">${esc(r.label)}</span>`).join('');
+
+  if (l.graduated_at) {
+    return `<div class="lad grad">
+      <div class="lad-top"><div class="sg">${esc(l.struggle)}
+        <small>Finished ${esc((l.graduated_at || '').slice(0, 10))} · solved cold, twice · ${pr.attempts} attempt${pr.attempts === 1 ? '' : 's'}</small></div>
+        <button class="quiet" style="font-size:12px" onclick="deleteLadder(${jsArg(l.ladder_id)})">Remove</button></div>
+      <div class="rungs">${ladUI.rungs.map(() => '<div class="rung done"></div>').join('')}</div>
+      ${cardOfferHTML(l)}
+    </div>`;
+  }
+
+  return `<div class="lad ${open ? 'open' : ''}">
+    <div class="lad-top">
+      <div class="sg">${esc(l.struggle)}
+        <small>Rung ${pr.rung_index + 1} of ${pr.total_rungs} · ${esc(pr.rung_label)}${pr.clean_streak ? ` · ${pr.clean_streak}/${pr.clean_needed} clean` : ''}</small></div>
+      <button class="quiet" style="font-size:12px" onclick="toggleLadder(${jsArg(l.ladder_id)})">${open ? 'Collapse' : 'Open'}</button>
+      <button class="quiet" style="font-size:12px" onclick="deleteLadder(${jsArg(l.ladder_id)})">Remove</button>
+    </div>
+    <div class="rungs">${bars}</div>
+    <div class="rung-labels">${labels}</div>
+    ${open ? ladderBodyHTML(l, pr) : ''}
+  </div>`;
+}
+
+function ladderBodyHTML(l, pr) {
+  const p = l.current;
+  const id = l.ladder_id;
+  const busy = ladUI.busy === id;
+  const last = ladUI.last[id];
+  if (!p) {
+    // No problem in front of you — either this ladder is brand new, or you
+    // just answered one. The verdict from that answer stays on screen next
+    // to the button for the next one.
+    return `<div style="margin-top:14px">
+      ${last ? verdictHTML(id, last) : ''}
+      <button class="primary" style="margin-top:${last ? '14px' : '0'}" onclick="nextProblem(${jsArg(id)})" ${busy ? 'disabled' : ''}>
+        ${busy ? 'Building…' : (last ? `Next problem — ${esc(pr.rung_label.toLowerCase())}` : 'Give me a problem')}</button>
+      ${ladUI.err[id] ? `<p class="error-msg">${esc(ladUI.err[id])}</p>` : ''}
+      ${historyHTML(l)}</div>`;
+  }
+  const steps = (arr) => (arr || []).map((x, i) => `<div class="sx-step"><div class="n">${i + 1}</div>
+    <div><div class="act">${esc(x.action || x)}</div>${x.why ? `<div class="why">${esc(x.why)}</div>` : ''}</div></div>`).join('');
+
+  return `<div style="margin-top:14px">
+    <p class="lad-support"><b>${esc(pr.rung_label)} —</b> ${esc(pr.support)}</p>
+    <div class="sx" style="margin-top:14px"><div class="sx-prob">${esc(p.problem)}</div></div>
+    ${(p.given || []).length ? `<div class="sx"><h4>Given</h4>${p.given.map(g => `<div class="sx-link">${esc(g)}</div>`).join('')}</div>` : ''}
+    ${p.principle && pr.rung_index >= 3 ? `<div class="sx"><div class="sx-note key"><b>The principle:</b> ${esc(p.principle)}</div></div>` : ''}
+    ${(p.shown || []).length ? `<div class="sx"><h4>${pr.rung_index === 0 ? 'Worked through' : 'Given to you'}</h4>${steps(p.shown)}</div>` : ''}
+    ${(p.blanks || []).length ? `<div class="sx"><h4>Your part</h4>${p.blanks.map((b, i) =>
+      `<div class="blank-row"><span class="bn">YOU</span><span>${esc(b)}</span></div>`).join('')}</div>` : ''}
+
+    ${pr.submits ? `
+      <div class="field" style="margin-top:14px">
+        <label>Your working${(p.blanks || []).length ? ' for the part above' : ''}</label>
+        <textarea id="lad-a-${esc(id)}" rows="4" placeholder="Show the steps, not just the number — that's what gets checked."
+          oninput="ladUI.answer[${jsArg(id)}] = this.value">${esc(ladUI.answer[id] || '')}</textarea>
+      </div>
+      <div class="row wrap" style="gap:8px;align-items:center">
+        <button class="primary" onclick="submitAttempt(${jsArg(id)})" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Check my work'}</button>
+        <details class="sx-hint" style="flex:1;min-width:200px;margin:0" ontoggle="if(this.open) ladUI.peeked[${jsArg(id)}]=true">
+          <summary>Show me the solution</summary>
+          <div class="hb">${steps(p.solution)}
+            ${p.answer ? `<div class="sx-note key" style="margin-top:10px"><b>Answer:</b> ${esc(p.answer)}</div>` : ''}
+            ${p.watch_out ? `<p class="hint">Watch out: ${esc(p.watch_out)}</p>` : ''}
+            <p class="hint">Looking is fine and costs you nothing except this rung's tick — the ladder only counts what you do unaided.</p></div>
+        </details>
+      </div>`
+    : `<div class="row wrap" style="gap:8px;margin-top:14px">
+        <button class="primary" onclick="submitAttempt(${jsArg(id)})" ${busy ? 'disabled' : ''}>${busy ? 'Working…' : 'I follow this — next'}</button>
+      </div>`}
+
+    <div class="row wrap" style="gap:8px;margin-top:10px">
+      <button class="quiet" style="font-size:12px" onclick="nextProblem(${jsArg(id)})" ${busy ? 'disabled' : ''}>Different problem, same rung</button>
+      <button class="quiet" style="font-size:12px" onclick="discardProblem(${jsArg(id)})" ${busy ? 'disabled' : ''}>This problem looks wrong</button>
+    </div>
+    ${ladUI.err[id] ? `<p class="error-msg">${esc(ladUI.err[id])}</p>` : ''}
+
+    ${last ? verdictHTML(id, last) : ''}
+    ${historyHTML(l)}
+    ${(l.sources || []).length ? `<p class="sx-src">Built from: ${l.sources.map(esc).join(', ')}</p>` : ''}
+  </div>`;
+}
+
+function verdictHTML(id, last) {
+  return `<div class="verdict ${esc(last.check.verdict)}">
+      <span class="vk">${esc(last.check.verdict)}</span>
+      <span class="vb">${esc(last.check.summary)}
+        ${last.check.went_wrong ? `<span class="wr"><b>Where it went wrong:</b> ${esc(last.check.went_wrong)}</span>` : ''}
+        ${last.check.right_move ? `<span class="wr"><b>The right move there:</b> ${esc(last.check.right_move)}</span>` : ''}</span>
+    </div>
+    <div class="lad-move">${esc(last.outcome.note)}</div>
+    <div class="row wrap" style="gap:6px;margin-top:8px">
+      <span class="muted" style="font-size:12px">Disagree?</span>
+      ${['correct', 'partial', 'wrong'].filter(v => v !== last.check.verdict).map(v =>
+        `<button class="quiet" style="font-size:12px" onclick="remark(${jsArg(id)},'${v}')">Mark it ${v}</button>`).join('')}
+    </div>`;
+}
+
+function historyHTML(l) {
+  if (!(l.attempts || []).length) return '';
+  return `<details class="lad-hist"><summary>History · ${l.attempts.length}</summary>
+    ${l.attempts.slice().reverse().map(a => `<div class="hrow">
+      <span class="hv ${esc(a.verdict)}">${esc(a.verdict)}</span>
+      <span style="flex:1;min-width:0">${esc(a.summary || a.problem || '')}</span>
+      <span class="muted" style="font-size:11px">${esc(rungLabel(a.rung))}${a.used_solution ? ' · peeked' : ''}</span>
+    </div>`).join('')}</details>`;
+}
+
+function rungLabel(key) {
+  const r = (ladUI.rungs || []).find(x => x.key === key);
+  return r ? r.label : key;
+}
+
+function cardOfferHTML(l) {
+  const good = (l.attempts || []).slice().reverse().find(a => a.verdict === 'correct');
+  const q = `${l.struggle} — what's the move?`;
+  const a = (good && (good.right_move || good.summary)) || '';
+  return `<div style="margin-top:12px">
+    <button class="quiet" style="font-size:12px" onclick="ladderToCard(${jsArg(l.ladder_id)}, ${jsArg(q)}, ${jsArg(a)})">
+      Add this to my flashcards</button>
+    <span class="muted" style="font-size:12px;margin-left:8px">so it gets reviewed instead of quietly decaying</span>
+    ${ladUI.err['card-' + l.ladder_id] ? `<p class="error-msg">${esc(ladUI.err['card-' + l.ladder_id])}</p>` : ''}</div>`;
+}
+
+function toggleLadder(id) { ladUI.openId = ladUI.openId === id ? null : id; renderLadders(); }
+
+async function startLadder() {
+  const text = (ladUI.newText || '').trim();
+  ladUI.err = {}; ladUI.busy = 'new'; renderLadders();
+  try {
+    const l = await postJSON('/api/ladder/' + ladUI.slug, { struggle: text });
+    ladUI.newText = ''; ladUI.openId = l.ladder_id;
+  } catch (e) { ladUI.err.new = e.message; }
+  ladUI.busy = '';
+  await loadLadders(ladUI.slug);
+  ladUI.openId = ladUI.openId || (ladUI.list[0] || {}).ladder_id;
+  renderLadders();
+  loadStudy(ladUI.slug).catch(() => {});
+}
+
+async function nextProblem(id) {
+  ladUI.busy = id; ladUI.err = {}; delete ladUI.last[id]; ladUI.answer[id] = ''; delete ladUI.peeked[id];
+  renderLadders();
+  try { await postJSON(`/api/ladder/${ladUI.slug}/${id}/next`); }
+  catch (e) { ladUI.err[id] = e.message; }
+  ladUI.busy = '';
+  await loadLadders(ladUI.slug);
+}
+
+const discardProblem = nextProblem;  // same call; the label is the difference
+
+async function submitAttempt(id) {
+  ladUI.busy = id; ladUI.err = {}; renderLadders();
+  try {
+    const r = await postJSON(`/api/ladder/${ladUI.slug}/${id}/attempt`, {
+      answer: ladUI.answer[id] || '', used_solution: !!ladUI.peeked[id],
+    });
+    ladUI.last[id] = { check: r.check, outcome: r.outcome };
+    ladUI.answer[id] = ''; delete ladUI.peeked[id];
+  } catch (e) { ladUI.err[id] = e.message; }
+  ladUI.busy = '';
+  await loadLadders(ladUI.slug);
+  // The rung may have moved; reload the study recommendation with it.
+  loadStudy(ladUI.slug).catch(() => {});
+}
+
+async function remark(id, verdict) {
+  try {
+    const r = await postJSON(`/api/ladder/${ladUI.slug}/${id}/remark`, { verdict });
+    if (ladUI.last[id]) { ladUI.last[id].check.verdict = verdict; ladUI.last[id].outcome = r.outcome; }
+  } catch (e) { ladUI.err[id] = e.message; }
+  await loadLadders(ladUI.slug);
+}
+
+async function deleteLadder(id) {
+  await api(`/api/ladder/${ladUI.slug}/${id}`, { method: 'DELETE' }).catch(() => {});
+  if (ladUI.openId === id) ladUI.openId = null;
+  await loadLadders(ladUI.slug);
+}
+
+async function ladderToCard(id, question, answer) {
+  ladUI.err = {};
+  try {
+    const r = await postJSON(`/api/ladder/${ladUI.slug}/${id}/card`, { question, answer });
+    ladUI.err['card-' + id] = r.added ? '' : (r.message || '');
+    state.deck[ladUI.slug] = await api('/api/quiz/deck/' + ladUI.slug).catch(() => state.deck[ladUI.slug]);
+  } catch (e) { ladUI.err['card-' + id] = e.message; }
+  renderLadders();
+}
+
+async function reassignScores(slug, from, to) {
+  try {
+    await postJSON(`/api/grades/${slug}/reassign`, { from, to });
+    state.grades[slug] = await api('/api/grades/' + slug);
+    render();
+  } catch (e) { alert(e.message); }
+}
+
+async function loadDrafts(slug) {
+  const el = $('drafts-list');
+  el.innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    const list = await api('/api/drafts/' + slug);
+    if (!list.length) { el.innerHTML = '<p class="muted">No saved drafts for this class yet.</p>'; return; }
+    el.innerHTML = `<label>Saved drafts</label>` + list.map(d =>
+      `<div class="deck-row"><span class="q">${esc(d.name)}</span>
+        <button class="quiet" style="font-size:12px" onclick="openDraft(${jsArg(slug)},${jsArg(d.name)})">Open</button></div>`).join('');
+  } catch (e) { el.innerHTML = `<p class="error-msg">${esc(e.message)}</p>`; }
+}
+
+async function openDraft(slug, name) {
+  const r = await api(`/api/drafts/${slug}/${encodeURIComponent(name)}`);
+  $('draft-out').style.display = 'block';
+  $('draft-body').textContent = r.content;
+}
+
+function wireClassView(c) {
+  const dz = $('dz'), fi = $('file-in');
+  if (!dz || !fi) return;
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+  dz.addEventListener('drop', e => { if (e.dataTransfer.files.length) uploadDoc(c.slug, e.dataTransfer.files); });
+  fi.addEventListener('change', () => { if (fi.files.length) uploadDoc(c.slug, fi.files); });
+}
+
+/* ---------- focus mode ---------- */
+const focus = { queue: [], index: 0, revealed: false, reviewed: 0, startedAt: null, ended: false, uid: null };
+let timerHandle = null;
+
+function recommendation() {
+  // The bridge between the two sides: Monitor knows what's at stake, so it
+  // decides what Focus serves. Grade impact first, urgency as the tiebreak.
+  const candidates = state.deadlines
+    .filter(d => !d.done && !d.dismissed && d.days_until !== null && d.days_until >= -3 && d.days_until <= 10)
+    .map(d => ({ d, worth: orderWeight(d) }));
+  candidates.sort((a, b) => (b.worth - a.worth) || (a.d.days_until - b.d.days_until));
+  const top = candidates[0];
+  if (top && top.worth >= 5) {
+    return { slug: top.d.class_slug, kind: 'assignment', uid: top.d.uid, title: top.d.title,
+      why: `${fmtPct(top.worth)}% of your ${top.d.class_name} grade · due ${top.d.days_until <= 0 ? 'now' : 'in ' + top.d.days_until + 'd'}` };
+  }
+  if (state.due.length) {
+    return { slug: state.due[0].class_slug, kind: 'review', uid: null,
+      title: `Review ${state.due.length} card${state.due.length === 1 ? '' : 's'}`,
+      why: 'Spaced review is the cheapest retention available today' };
+  }
+  if (top) {
+    return { slug: top.d.class_slug, kind: 'assignment', uid: top.d.uid, title: top.d.title,
+      why: `Next deadline in ${top.d.class_name}` };
+  }
+  return null;
+}
+
+function focusPickerHTML() {
+  const rec = recommendation();
+  const rows = state.classes.map(c => ({
+    c,
+    due: state.due.filter(x => x.class_slug === c.slug).length,
+    next: state.deadlines.find(d => d.class_slug === c.slug && !d.done && !d.dismissed && d.days_until !== null && d.days_until >= 0),
+  }));
+  const nameFor = (slug) => (state.classes.find(c => c.slug === slug) || {}).name || '?';
+  return `<div class="focus-shell"><div class="focus-body">
+    <div class="focus-bar">
+      <div><div class="who">Focus</div><div class="meta">One thing at a time. Everything else is hidden.</div></div>
+      <button class="quiet" style="margin-left:auto" onclick="location.hash = '#/'">Back to monitor</button>
+    </div>
+    ${rec ? `<div class="focus-progress">Recommended</div>
+      <a class="pick-row hero" href="#" onclick="startFocus(event, ${jsArg(rec.slug)}, ${jsArg(rec.kind)}, ${rec.uid ? `${jsArg(rec.uid)}` : 'null'})">
+        <span class="chip" style="${chipStyle(rec.slug)}">${esc(initials(nameFor(rec.slug)))}</span>
+        <span class="t">${esc(rec.title)}<span class="sub">${esc(rec.why)}</span></span>
+        <span class="muted">Start &rarr;</span>
+      </a>` : `<div class="empty"><p>Nothing pressing. Add a class or upload material to get started.</p></div>`}
+    ${rows.length ? `<div class="focus-progress" style="margin-top:24px">By class</div>` : ''}
+    ${rows.map(({ c, due, next }) => `
+      <a class="pick-row" href="#" onclick="startFocus(event, ${jsArg(c.slug)}, 'review', null)">
+        <span class="chip" style="${chipStyle(c.slug)}">${esc(initials(c.name))}</span>
+        <span class="t">${esc(c.name)}<span class="sub">${due ? `${due} card${due === 1 ? '' : 's'} to review` : 'No cards due'}</span></span>
+        <span class="muted">Review &rarr;</span>
+      </a>
+      ${next ? `<a class="pick-row" style="margin-left:28px" href="#" onclick="startFocus(event, ${jsArg(c.slug)}, 'assignment', ${jsArg(next.uid)})">
+        <span class="t" style="font-weight:500">Work on: ${esc(next.title)}<span class="sub">${worthLabel(next) ? esc(worthLabel(next)) + ' of grade &middot; ' : ''}due ${fmtDue(next.due)}</span></span>
+        <span class="muted">Open &rarr;</span>
+      </a>` : ''}`).join('')}
+  </div></div>`;
+}
+
+function startFocus(ev, slug, kind, uid) {
+  if (ev) ev.preventDefault();
+  focus.queue = []; focus.index = 0; focus.revealed = false; focus.reviewed = 0;
+  focus.startedAt = new Date().toISOString(); focus.ended = false; focus.uid = uid || null;
+  location.hash = `#/focus/${encodeURIComponent(slug)}/${kind}`;
+}
+
+function elapsedMinutes() {
+  return focus.startedAt ? (Date.now() - new Date(focus.startedAt).getTime()) / 60000 : 0;
+}
+
+function timerText() {
+  const total = Math.floor(elapsedMinutes() * 60);
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+
+function startTimerTick() {
+  clearInterval(timerHandle);
+  timerHandle = setInterval(() => {
+    const el = document.getElementById('focus-timer');
+    if (!el) { clearInterval(timerHandle); return; }
+    el.textContent = timerText();
+  }, 1000);
+}
+
+function renderFocus(r) {
+  const c = state.classes.find(x => x.slug === r.slug);
+  if (!c) { location.hash = '#/focus'; return; }
+  if (!focus.startedAt) { focus.startedAt = new Date().toISOString(); focus.ended = false; }
+  if (r.kind === 'review' && !focus.queue.length && !focus.ended) {
+    focus.queue = state.due.filter(x => x.class_slug === r.slug);
+  }
+  $('main').innerHTML = focusSessionHTML(c, r.kind);
+  startTimerTick();
+}
+
+function focusChrome(c, sub, body) {
+  return `<div class="focus-shell"><div class="focus-body">
+    <div class="focus-bar">
+      <span class="chip" style="${chipStyle(c.slug)};width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff">${esc(initials(c.name))}</span>
+      <div><div class="who">${esc(c.name)}</div><div class="meta">${sub}</div></div>
+      <span class="timer" id="focus-timer">${timerText()}</span>
+      <button class="quiet" onclick="endFocus(${jsArg(c.slug)})">End session</button>
+    </div>
+    ${body}
+  </div></div>`;
+}
+
+function focusSessionHTML(c, kind) {
+  if (focus.ended) {
+    const mins = Math.max(1, Math.round(elapsedMinutes()));
+    return focusChrome(c, 'Session complete', `<div class="focus-card focus-done">
+      <div class="big">${focus.reviewed || mins}</div>
+      <p class="muted" style="margin-top:6px">${focus.reviewed ? `card${focus.reviewed === 1 ? '' : 's'} reviewed in ${mins} min` : `minutes of focused work`}</p>
+      <div class="focus-actions" style="max-width:340px;margin:22px auto 0">
+        <button onclick="location.hash = '#/focus'">Another session</button>
+        <button class="primary" onclick="location.hash = '#/'">Back to monitor</button>
+      </div></div>`);
+  }
+
+  if (kind === 'assignment') {
+    const d = state.deadlines.find(x => x.uid === focus.uid) ||
+              state.deadlines.find(x => x.class_slug === c.slug && !x.done && !x.dismissed && x.days_until !== null && x.days_until >= 0);
+    if (!d) {
+      return focusChrome(c, 'Nothing scheduled', `<div class="focus-card"><p class="muted">No upcoming deadline for this class.</p></div>`);
+    }
+    const mats = (state.materials[c.slug] || []).filter(m => m.extracted);
+    return focusChrome(c, 'Working on one thing', `<div class="focus-card">
+      <div class="focus-progress">${worthLabel(d) ? esc(worthLabel(d)) + ' of your grade &middot; ' : ''}due ${fmtDue(d.due)}</div>
+      <div class="focus-q">${esc(d.title)}</div>
+      ${safeUrl(d.link) ? `<p style="margin-top:14px"><a href="${esc(safeUrl(d.link))}" target="_blank" rel="noopener noreferrer">Open it in MyCourses &rarr;</a></p>` : ''}
+      ${mats.length ? `<p class="muted" style="margin-top:12px">Material on file: ${mats.slice(0, 4).map(m => esc(m.filename)).join(', ')}${mats.length > 4 ? ` +${mats.length - 4} more` : ''}</p>` : ''}
+      <div style="margin-top:20px">
+        <label>Ask about it, or draft something</label>
+        <textarea id="focus-prompt" rows="3" placeholder="e.g. Walk me through setting up the control volume for problem 3 — don't just give me the answer."></textarea>
+        <div class="focus-actions">
+          <button onclick="focusAsk(${jsArg(c.slug)}, false)">Explain it to me</button>
+          <button class="primary" onclick="focusAsk(${jsArg(c.slug)}, true)">Draft it</button>
+        </div>
+        <div id="focus-err" class="error-msg"></div>
+        <div id="focus-out" class="draft-body" style="display:none;margin-top:14px"></div>
+      </div>
+      <div style="margin-top:18px"><button class="quiet" onclick="markDoneFromFocus(${jsArg(c.slug)}, ${jsArg(d.uid)})">Mark this done</button></div>
+    </div>`);
+  }
+
+  if (!focus.queue.length) {
+    return focusChrome(c, 'Nothing due', `<div class="focus-card">
+      <p class="muted">No cards are due for this class right now.</p>
+      <div class="focus-actions"><button class="primary" onclick="generateInFocus(${jsArg(c.slug)}, this)">Generate questions from my material</button></div>
+      <div id="focus-err" class="error-msg"></div></div>`);
+  }
+  const card = focus.queue[focus.index];
+  if (!card) { focus.ended = true; return focusSessionHTML(c, kind); }
+  return focusChrome(c, 'Reviewing', `<div class="focus-card">
+    <div class="focus-progress">Card ${focus.index + 1} of ${focus.queue.length}</div>
+    <div class="focus-q">${esc(card.question)}</div>
+    ${focus.revealed
+      ? `<div class="focus-a">${esc(card.answer)}</div>
+         <div class="focus-actions">
+           <button onclick="focusRate(${jsArg(c.slug)},'again')">Again</button>
+           <button onclick="focusRate(${jsArg(c.slug)},'hard')">Hard</button>
+           <button onclick="focusRate(${jsArg(c.slug)},'good')">Good</button>
+           <button class="primary" onclick="focusRate(${jsArg(c.slug)},'easy')">Easy</button>
+         </div>`
+      : `<div class="focus-actions"><button class="primary" onclick="focus.revealed = true; render()">Reveal answer</button></div>`}
+  </div>`);
+}
+
+async function focusRate(slug, rating) {
+  const card = focus.queue[focus.index];
+  focus.revealed = false;
+  focus.reviewed += 1;
+  focus.index += 1;
+  if (focus.index >= focus.queue.length) focus.ended = true;
+  render();
+  try {
+    await api('/api/quiz/review', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: slug, card_id: card.card_id, rating }) });
+  } catch (e) { /* the session keeps moving; the next refresh reconciles */ }
+}
+
+async function generateInFocus(slug, btn) {
+  const err = $('focus-err');
+  btn.disabled = true; btn.textContent = 'Generating…'; if (err) err.textContent = '';
+  try {
+    await api('/api/quiz/generate', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: slug }) });
+    await loadAll();
+    focus.queue = state.due.filter(x => x.class_slug === slug);
+    focus.index = 0; focus.revealed = false;
+    render();
+  } catch (e) {
+    if (err) err.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Generate questions from my material';
+  }
+}
+
+async function focusAsk(slug, asDraft) {
+  const err = $('focus-err'), out = $('focus-out');
+  const prompt = $('focus-prompt').value.trim();
+  err.textContent = '';
+  if (!prompt) { err.textContent = 'Say what you need first.'; return; }
+  out.style.display = 'block'; out.textContent = 'Thinking…';
+  try {
+    if (asDraft) {
+      const r = await api('/api/draft', { method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ class_slug: slug, prompt }) });
+      out.textContent = r.content + '\n\n— saved to ' + r.path;
+    } else {
+      const r = await api(`/api/getahead/${slug}/summarize`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ topic: prompt }) });
+      out.textContent = r.summary;
+    }
+  } catch (e) { out.style.display = 'none'; err.textContent = e.message; }
+}
+
+async function markDoneFromFocus(slug, uid) {
+  await api('/api/deadlines/done', { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ class_slug: slug, uid, done: true }) });
+  focus.ended = true;
+  await loadAll();
+  render();
+}
+
+async function endFocus(slug) {
+  clearInterval(timerHandle);
+  const minutes = elapsedMinutes();
+  const alreadyDone = focus.ended;
+  focus.ended = true;
+  if (minutes >= 0.5) {
+    try {
+      await api('/api/sessions', { method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ class_slug: slug, kind: focus.uid ? 'assignment' : 'review',
+          label: '', items: focus.reviewed, minutes, started_at: focus.startedAt }) });
+    } catch (e) { /* logging is best-effort — never block leaving a session */ }
+  }
+  await loadAll();
+  if (alreadyDone) location.hash = '#/';
+  else render();
+}
+
+
+/* ---------- chat ---------- */
+const chat = { convId: null, convo: null, list: [], mentionables: [], picked: [], sending: false,
+               uploading: false, warning: null, menuOpen: false, menuIndex: 0, menuItems: [], anchor: 0 };
+
+async function loadChatList() {
+  chat.list = await api('/api/chat').catch(() => []);
+  chat.mentionables = await api('/api/chat/mentionable').catch(() => []);
+}
+
+async function openConversation(id) {
+  chat.convId = id;
+  chat.picked = [];
+  chat.convo = id ? await api('/api/chat/' + id).catch(() => null) : null;
+  render();
+}
+
+function chatHTML() {
+  const msgs = (chat.convo && chat.convo.messages) || [];
+  return `<div class="page chat-page">
+    <div class="page-head">
+      <div class="kicker">Ask</div>
+      <h1>Chat</h1>
+      <div class="sub">Ask anything. Type <b>@</b> to pull in a class or a document — it answers from your own material, not from general knowledge.</div>
+    </div>
+
+    <div class="chat-layout">
+      <aside class="chat-side">
+        <button class="primary" style="width:100%" onclick="openConversation(null)">New conversation</button>
+        <div class="chat-list">
+          ${chat.list.length ? chat.list.map(c => `
+            <div class="chat-item ${c.id === chat.convId ? 'on' : ''}" onclick="openConversation(${jsArg(c.id)})">
+              <span class="t">${esc(c.title)}</span>
+              <button class="quiet" style="font-size:11px;padding:2px 6px" onclick="event.stopPropagation();deleteConversation(${jsArg(c.id)})">×</button>
+            </div>`).join('')
+            : '<p class="muted" style="padding:10px 4px">No conversations yet.</p>'}
+        </div>
+      </aside>
+
+      <section class="chat-main" id="chat-main">
+        <div class="chat-drop" id="chat-drop">Drop to share with the assistant</div>
+        <div class="chat-thread" id="chat-thread">
+          ${msgs.length ? msgs.map(m => `
+            <div class="msg ${esc(m.role)}">
+              <div class="who">${m.role === 'user' ? 'You' : 'Study assistant'}</div>
+              ${(m.mentions || []).length ? `<div class="msg-mentions">${m.mentions.map(x => `<span class="mention-chip ${x.type === 'upload' ? 'file' : ''}">${x.type === 'upload' ? '📎 ' : '@'}${esc(x.name)}</span>`).join('')}</div>` : ''}
+              <div class="body">${esc(m.content)}</div>
+            </div>`).join('')
+            : `<div class="empty" style="padding-top:40px"><div class="eic">${IC.compass}</div>
+                <p>Ask a question about anything you're studying. Try <b>@</b>-mentioning a class — for example
+                “explain @${esc((state.classes[0] || {}).name || 'your class')} like I'm five” — and it will answer
+                from the documents you've uploaded for it.</p></div>`}
+          ${chat.sending ? `<div class="msg assistant"><div class="who">Study assistant</div>
+            <div class="body muted" id="thinking">Thinking…</div></div>` : ''}
+        </div>
+
+        <div class="chat-compose">
+          ${chat.warning ? `<div class="upload-warn">${esc(chat.warning)}<button class="quiet" style="padding:0 5px" onclick="chat.warning=null;render()">×</button></div>` : ''}
+          ${chat.uploading ? '<div class="muted" style="margin-bottom:8px">Reading file…</div>' : ''}
+          ${chat.picked.length ? `<div class="picked">${chat.picked.map((m, i) =>
+            `<span class="mention-chip on ${m.type === 'upload' ? 'file' : ''}">${m.type === 'upload' ? '📎 ' : '@'}${esc(m.name)}<button class="quiet" style="padding:0 4px;font-size:12px" onclick="unpick(${i})">×</button></span>`).join('')}</div>` : ''}
+          <div class="compose-row">
+            <button class="quiet attach-btn" title="Share a file with the assistant" onclick="$('chat-file').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <input type="file" id="chat-file" multiple style="display:none" onchange="uploadToChat(this.files)">
+            <textarea id="chat-input" rows="2" placeholder="Ask anything… type @ to reference a class, document, or shared file"
+              oninput="onChatInput(this)" onkeydown="onChatKey(event, this)"></textarea>
+            <button class="primary" id="chat-send" onclick="sendChat()">Send</button>
+          </div>
+          <div class="hint">Enter sends · Shift+Enter for a new line · drop a file anywhere here to share it</div>
+          <div id="chat-err" class="error-msg"></div>
+          <div class="mention-menu" id="mention-menu" style="display:none"></div>
+        </div>
+      </section>
+    </div>
+  </div>`;
+}
+
+async function uploadToChat(files) {
+  const list = Array.from(files || []);
+  if (!list.length) return;
+  const err = $('chat-err');
+  if (err) err.textContent = '';
+  chat.uploading = true; render();
+  try {
+    for (const file of list) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const resp = await fetch('/api/chat/upload', { method: 'POST', body: fd });
+      const body = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(body.error || `upload failed (${resp.status})`);
+      if (!chat.picked.some(p => p.type === 'upload' && p.relpath === body.relpath)) {
+        chat.picked.push(body);
+      }
+      if (body.warning) chat.warning = body.warning;
+    }
+    await loadChatList();
+  } catch (e) {
+    if ($('chat-err')) $('chat-err').textContent = e.message;
+  } finally {
+    chat.uploading = false;
+    render();
+    const el = $('chat-input'); if (el) el.focus();
+  }
+}
+
+function wireChatDrop() {
+  const panel = $('chat-main'), overlay = $('chat-drop');
+  if (!panel || !overlay) return;
+  let depth = 0;  // dragenter/leave fire per child element; count to avoid flicker
+  panel.addEventListener('dragenter', e => { e.preventDefault(); depth++; overlay.classList.add('on'); });
+  panel.addEventListener('dragover', e => e.preventDefault());
+  panel.addEventListener('dragleave', e => { e.preventDefault(); if (--depth <= 0) { depth = 0; overlay.classList.remove('on'); } });
+  panel.addEventListener('drop', e => {
+    e.preventDefault(); depth = 0; overlay.classList.remove('on');
+    if (e.dataTransfer.files.length) uploadToChat(e.dataTransfer.files);
+  });
+}
+
+/* ---- @-mention autocomplete ---- */
+function onChatInput(el) {
+  const upto = el.value.slice(0, el.selectionStart);
+  const at = upto.lastIndexOf('@');
+  // Only an @ that starts a word and has no space after it is a live mention.
+  if (at === -1 || (at > 0 && !/\s/.test(upto[at - 1])) || /\s/.test(upto.slice(at + 1))) {
+    return closeMentionMenu();
+  }
+  const term = upto.slice(at + 1).toLowerCase();
+  chat.anchor = at;
+  chat.menuItems = chat.mentionables
+    .filter(m => m.name.toLowerCase().includes(term) || (m.detail || '').toLowerCase().includes(term))
+    .slice(0, 8);
+  chat.menuIndex = 0;
+  chat.menuItems.length ? renderMentionMenu() : closeMentionMenu();
+}
+
+function renderMentionMenu() {
+  const menu = $('mention-menu');
+  if (!menu) return;
+  chat.menuOpen = true;
+  menu.style.display = 'block';
+  menu.innerHTML = chat.menuItems.map((m, i) => `
+    <div class="mention-opt ${i === chat.menuIndex ? 'on' : ''}" onmousedown="event.preventDefault();pickMention(${i})">
+      <span class="kind">${m.type === 'class' ? 'class' : 'doc'}</span>
+      <span class="nm">${esc(m.name)}</span>
+      <span class="muted">${esc(m.detail || '')}</span>
+    </div>`).join('');
+}
+
+function closeMentionMenu() {
+  chat.menuOpen = false;
+  const menu = $('mention-menu');
+  if (menu) { menu.style.display = 'none'; menu.innerHTML = ''; }
+}
+
+function pickMention(i) {
+  const m = chat.menuItems[i];
+  if (!m) return;
+  const el = $('chat-input');
+  const before = el.value.slice(0, chat.anchor);
+  const after = el.value.slice(el.selectionStart);
+  el.value = `${before}@${m.name} ${after}`;
+  el.focus();
+  el.selectionStart = el.selectionEnd = (before + '@' + m.name + ' ').length;
+  if (!chat.picked.some(p => p.type === m.type && p.slug === m.slug && p.relpath === m.relpath)) {
+    chat.picked.push(m);
+  }
+  closeMentionMenu();
+  renderPicked();
+}
+
+function renderPicked() {
+  // Re-render just the chip row so the textarea keeps focus and caret.
+  const wrap = document.querySelector('.chat-compose .picked');
+  const html = chat.picked.map((m, i) =>
+    `<span class="mention-chip on">@${esc(m.name)}<button class="quiet" style="padding:0 4px;font-size:12px" onclick="unpick(${i})">×</button></span>`).join('');
+  if (wrap) { wrap.innerHTML = html; return; }
+  const compose = document.querySelector('.chat-compose');
+  if (compose && html) compose.insertAdjacentHTML('afterbegin', `<div class="picked">${html}</div>`);
+}
+
+function unpick(i) {
+  chat.picked.splice(i, 1);
+  renderPicked();
+  if (!chat.picked.length) {
+    const wrap = document.querySelector('.chat-compose .picked');
+    if (wrap) wrap.remove();
+  }
+}
+
+function onChatKey(ev, el) {
+  if (chat.menuOpen) {
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); chat.menuIndex = (chat.menuIndex + 1) % chat.menuItems.length; return renderMentionMenu(); }
+    if (ev.key === 'ArrowUp') { ev.preventDefault(); chat.menuIndex = (chat.menuIndex - 1 + chat.menuItems.length) % chat.menuItems.length; return renderMentionMenu(); }
+    if (ev.key === 'Enter' || ev.key === 'Tab') { ev.preventDefault(); return pickMention(chat.menuIndex); }
+    if (ev.key === 'Escape') { ev.preventDefault(); return closeMentionMenu(); }
+  }
+  if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); sendChat(); }
+}
+
+async function sendChat() {
+  const el = $('chat-input');
+  const text = (el.value || '').trim();
+  const err = $('chat-err');
+  err.textContent = '';
+  if (!text || chat.sending) return;
+
+  // Drop @-mentions the owner deleted from the text after picking them.
+  // Shared files are kept regardless: they were attached by button or drop,
+  // so their name never appears in the message text.
+  const mentions = chat.picked.filter(m => m.type === 'upload' || text.includes('@' + m.name));
+  chat.sending = true;
+  el.value = '';
+  closeMentionMenu();
+  render();
+  // A silent "Thinking…" is indistinguishable from a hang, and a busy free
+  // tier can genuinely take most of a minute (with a retry, longer). Say how
+  // long it has been, and say what's happening once it stops looking normal.
+  const started = Date.now();
+  const ticker = setInterval(() => {
+    const el2 = $('thinking');
+    if (!el2) return;
+    const secs = Math.round((Date.now() - started) / 1000);
+    el2.textContent = secs < 8 ? 'Thinking…'
+      : secs < 30 ? `Thinking… ${secs}s`
+      : `Still waiting on the model — ${secs}s. Busy free tiers do this; it will fall back to your local model if one is running.`;
+  }, 1000);
+
+  try {
+    const convo = await api('/api/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ conversation_id: chat.convId, text, mentions }),
+    });
+    chat.convo = convo;
+    chat.convId = convo.id;
+    chat.picked = [];
+    await loadChatList();
+  } catch (e) {
+    const m = $('chat-err');
+    if (m) m.textContent = e.message;
+    if ($('chat-input')) $('chat-input').value = text;  // never eat the question
+  } finally {
+    clearInterval(ticker);
+    chat.sending = false;
+    render();
+    const thread = $('chat-thread');
+    if (thread) thread.scrollTop = thread.scrollHeight;
+  }
+}
+
+async function deleteConversation(id) {
+  await api('/api/chat/' + id, { method: 'DELETE' });
+  if (chat.convId === id) { chat.convId = null; chat.convo = null; }
+  await loadChatList();
+  render();
+}
+
+/* ---------- briefing ---------- */
+function briefingAge(iso) {
+  const then = new Date(iso);
+  if (isNaN(then)) return '';
+  const mins = Math.max(0, Math.round((Date.now() - then.getTime()) / 60000));
+  if (mins < 60) return `updated ${mins || 1}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 48) return `updated ${hrs}h ago`;
+  return `updated ${Math.round(hrs / 24)}d ago`;
+}
+
+// Must match briefing.line_key on the server exactly — same three string
+// operations, so a line ticked here resolves to the same stored key.
+function briefKeyOf(line) {
+  return String(line).replace(/\u2014/g, '-').split(/\s+/).filter(Boolean).join(' ')
+    .replace(/^[-•*\s]+|[-•*\s]+$/g, '').toLowerCase();
+}
+
+// Sections that report state rather than ask for work. Matched loosely
+// because the model writes its own headings — anything not matching stays
+// checkable, so a new heading errs toward being actionable.
+const INFO_HEADINGS = /where you stand|been learning|learned|progress|standing|status/i;
+// ...and a line-level version, because a couple of lines under an otherwise
+// actionable heading are counts rather than work — "(3 more from earlier in
+// the semester still unmarked)" is not something you tick off, and a
+// checkbox on it makes the "n of m done" counter lie.
+const INFO_LINE = /^[-•]\s*\(/;
+
+function briefingBody(content) {
+  // Tiny renderer for the briefing text: #/## lines become headings,
+  // "- " lines become checkable rows, **bold** works; everything else is a
+  // paragraph. All content escaped before any markup is applied.
+  const out = [];
+  let actionable = true;
+  for (const raw of String(content).split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    let h = esc(line);
+    h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    if (/^#{1,3}\s/.test(line)) {
+      const heading = line.replace(/^#{1,3}\s*/, '');
+      actionable = !INFO_HEADINGS.test(heading);
+      out.push(`<div class="brief-h">${esc(heading)}</div>`);
+    } else if (/^[-•]\s/.test(line) && (!actionable || INFO_LINE.test(line))) {
+      out.push(`<div class="brief-li">${h.replace(/^[-•]\s*/, '')}</div>`);
+    } else if (/^[-•]\s/.test(line)) {
+      const body = h.replace(/^[-•]\s*/, '');
+      const done = state.briefChecked.has(briefKeyOf(line));
+      out.push(`<label class="brief-li check ${done ? 'done' : ''}">
+        <input type="checkbox" ${done ? 'checked' : ''} onchange="toggleBriefLine(this)" data-line="${esc(line)}">
+        <span class="tick"></span><span class="txt">${body}</span></label>`);
+    } else {
+      out.push(`<p class="brief-p">${h}</p>`);
+    }
+  }
+  return out.join('');
+}
+
+async function toggleBriefLine(input) {
+  const line = input.dataset.line;
+  const label = input.closest('.brief-li');
+  const checked = input.checked;
+  label.classList.toggle('done', checked);  // strike through immediately
+  try {
+    const r = await api('/api/briefing/check', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ line, checked }),
+    });
+    state.briefChecked = new Set(r.checked || []);
+    updateBriefProgress();
+  } catch (e) {
+    input.checked = !checked;
+    label.classList.toggle('done', !checked);
+  }
+}
+
+function updateBriefProgress() {
+  const el = document.getElementById('brief-progress');
+  if (!el) return;
+  const boxes = document.querySelectorAll('.brief-li.check input');
+  const done = document.querySelectorAll('.brief-li.check input:checked').length;
+  el.textContent = boxes.length ? `${done} of ${boxes.length} done` : '';
+}
+
+async function refreshBriefing() {
+  const btn = $('brief-btn'), msg = $('brief-msg');
+  btn.disabled = true; btn.textContent = 'Scanning everything…'; if (msg) msg.textContent = '';
+  try {
+    await api('/api/briefing/generate', { method: 'POST' });
+    await refresh();
+  } catch (e) {
+    const m = $('brief-msg'); if (m) m.textContent = e.message;
+    const b = $('brief-btn'); if (b) { b.disabled = false; b.textContent = state.briefing ? 'Refresh' : 'Generate'; }
+  }
+}
+
+/* ---------- help / how to use ---------- */
+function settingsTabs(active) {
+  return `<div class="subtabs">
+    <a href="#/settings" class="${active === 'model' ? 'on' : ''}">Model &amp; keys</a>
+    <a href="#/settings/help" class="${active === 'help' ? 'on' : ''}">How to use this</a>
+  </div>`;
+}
+
+const HELP_SECTIONS = [
+  { id: 'start', t: 'Start here' },
+  { id: 'classes', t: 'Adding your classes' },
+  { id: 'deadlines', t: 'Deadlines' },
+  { id: 'documents', t: 'Documents' },
+  { id: 'grade', t: 'Grade tracking' },
+  { id: 'stuck', t: 'What are you stuck on?' },
+  { id: 'modes', t: 'Study modes' },
+  { id: 'study', t: 'Flashcards & study' },
+  { id: 'chat', t: 'Chat' },
+  { id: 'focus', t: 'Focus mode' },
+  { id: 'briefing', t: 'Daily briefing' },
+  { id: 'ai', t: 'The AI model' },
+  { id: 'data', t: 'Your data & backup' },
+  { id: 'trouble', t: 'When something breaks' },
+];
+
+function helpHTML() {
+  return `<div class="page">
+    <div class="page-head">
+      <div class="kicker">Settings</div>
+      <h1>How to use this</h1>
+      <div class="sub">Everything the app does, and how to actually do it. Nothing here assumes you built it.</div>
+    </div>
+    ${settingsTabs('help')}
+
+    <div class="help-layout">
+      <nav class="help-toc">
+        ${HELP_SECTIONS.map(s => `<a href="#/settings/help" onclick="jumpHelp(event,'${s.id}')">${esc(s.t)}</a>`).join('')}
+      </nav>
+
+      <div>
+        <section class="card help-sec" id="h-start">
+          <h3>Start here</h3>
+          <p class="lede">The app has two halves, and knowing which one you're in explains almost everything else.</p>
+          <div class="kv"><span class="k">Monitor</span><span class="v">The sidebar and everything behind it. This is for <b>scanning</b> — what's due, what you're getting in each class, what you've uploaded. Dense on purpose. You check it for two minutes between classes.</span></div>
+          <div class="kv"><span class="k">Focus</span><span class="v">The <b>Start focus session</b> button. Full screen, sidebar hidden, one thing at a time, timer running. This is for <b>doing</b> — reviewing cards or working through one assignment without the rest of your workload staring at you.</span></div>
+          <p style="margin-top:14px">If you only ever do two things: add your classes (below), then hit <b>Start focus session</b> when you sit down to work. It picks what to work on for you.</p>
+          <div class="callout">Nothing in this app ever submits anything to MyCourses. It reads your calendar and writes files on your own computer. Every draft it writes is tagged as a draft and saved locally for you to review — you always submit by hand, yourself.</div>
+        </section>
+
+        <section class="card help-sec" id="h-classes">
+          <h3>Adding your classes</h3>
+          <p class="lede">Each class connects through a private calendar link from MyCourses. No password ever touches this app.</p>
+          <ol class="help-steps">
+            <li>In MyCourses, open <b>Calendar</b> from the top nav.</li>
+            <li>Click <b>Settings</b> in the calendar toolbar, tick <b>Enable Calendar Feeds</b>, and Save. You only ever do this once, for your whole account.</li>
+            <li>A <b>Subscribe</b> button appears in the toolbar. Click it.</li>
+            <li>In the dropdown, pick <b>one specific course</b> — not "All Calendars and Tasks". Picking a course gives you a link ending in <code>feedOU=…&token=…</code> that only contains that class.</li>
+            <li>Copy that link. In this app, click <b>+ Add class</b>, give it a name, paste the link, and add it.</li>
+            <li>Repeat for each course. The dropdown remembers where you were, so it's quick.</li>
+          </ol>
+          <p><b>Why there's no Brightspace login:</b> RIT's full Brightspace API is locked to IT staff — students can't get access to it. The calendar feed is D2L's own self-service alternative. Your password never goes anywhere near this app, and you can kill the link any time from that same Subscribe box (there's a <b>Reset</b> button, which invalidates every feed link you've made).</p>
+          <div class="callout warn">Treat those feed links like passwords — anyone holding one can read your calendar. They're stored only in <code>config/classes.yaml</code> on your own machine.</div>
+          <p><b>If you only have one "All Calendars" link:</b> paste the same link into every class and put something unique to that course (like <code>COURSE.102</code>) in the <b>Filter keyword</b> box. Each class then keeps only the events mentioning it. Per-course links are cleaner if you can get them.</p>
+        </section>
+
+        <section class="card help-sec" id="h-deadlines">
+          <h3>Deadlines</h3>
+          <p class="lede">Pulled automatically from your calendar feeds every 30 minutes while the app is open.</p>
+          <ul>
+            <li><b>Click the title</b> to jump straight to that assignment, quiz, or dropbox in MyCourses — not the calendar, the actual item.</li>
+            <li><b>The checkbox</b> marks something done. It leaves the Overdue count, the sidebar badges, and the briefing, and moves to a collapsed "Done" list. Brightspace never tells the app you submitted something, so this is how the board stays honest.</li>
+            <li><b>The × on hover</b> clears something from the board entirely — for things that will never be "done", like informational postings or a duplicate an instructor left up. Cleared items go to a "Cleared from board" list and can be restored.</li>
+            <li><b>The coloured percentage</b> is what that item is worth toward your final grade. It only appears once you've set up grade tracking for the class. Red means 10% or more.</li>
+            <li><b>Sync now</b> in the sidebar forces an immediate refresh if you can't wait 30 minutes.</li>
+          </ul>
+          <p>Both "done" and "cleared" survive every future sync — the app keeps them in their own files, so re-pulling your calendar never resurrects something you already dealt with.</p>
+        </section>
+
+        <section class="card help-sec" id="h-documents">
+          <h3>Documents</h3>
+          <p class="lede">This is the fuel. Everything smart the app does reads from what you put here.</p>
+          <ul>
+            <li><b>Drag files onto the drop zone</b>, or click it to browse. Multiple files at once is fine. PDFs and text files get read in full; other formats are stored but not readable yet.</li>
+            <li><b>Or paste text directly</b> — open "Or paste text directly" and paste a syllabus section, lecture notes, or a reading. Same effect as uploading a file.</li>
+            <li><b>Delete</b> removes a document. It asks once before actually deleting.</li>
+            <li>A <b>"no text"</b> tag means the file is a scanned image with no readable text inside. It's stored, but the app can't use it for questions or summaries. Re-download a text-based version if you can.</li>
+          </ul>
+          <div class="callout">Upload the syllabus first for every class. It's what powers automatic grade tracking, and it's usually the single highest-value file you can add.</div>
+        </section>
+
+        <section class="card help-sec" id="h-grade">
+          <h3>Grade tracking</h3>
+          <p class="lede">Without this the app can only sort by date — it can't tell a 1% discussion post from a 20% midterm.</p>
+          <ol class="help-steps">
+            <li>Upload the class syllabus to <b>Documents</b>.</li>
+            <li>On the class's <b>Grade</b> tab, click <b>Read grading from syllabus</b>. It pulls out the categories, weights, how many of each there are, drop-lowest rules, and exam dates.</li>
+            <li><b>Check what it found</b> against the real syllabus, then click <b>Looks right</b>. Until you do, it's labelled "unconfirmed" — a wrong weight produces confident wrong advice, so nothing is trusted until you say so.</li>
+            <li>As grades come back, open <b>Add a score</b> and enter what you got out of what. That's it.</li>
+          </ol>
+          <p>Once there's at least one score you get: your <b>current standing</b>, how much of your grade is already decided versus still in play, a per-category breakdown, and a table of <b>what average you'd need on everything remaining</b> to land each letter grade. Anything out of reach is greyed out; anything already locked in says so.</p>
+          <p>You can skip the syllabus reading entirely and just enter categories by hand if you'd rather — the maths is identical.</p>
+          <div class="callout warn">If the weights don't add to 100%, the app says so under the breakdown. That usually means the syllabus had an extra category it couldn't read — add it manually.</div>
+        </section>
+
+        <section class="card help-sec" id="h-stuck">
+          <h3>What are you stuck on?</h3>
+          <p class="lede">Name the thing that keeps costing you marks and it builds a run of practice problems around that specific difficulty — starting fully worked, handing more of each one to you as you get them right, until you're solving them cold.</p>
+          <p>The five rungs, in order:</p>
+          <ul>
+            <li><b>Watch it done</b> — the whole solution with the reason for every step. Nothing to submit; you read it.</li>
+            <li><b>You finish it</b> — worked through to the last move. You take it home.</li>
+            <li><b>You do the hard part</b> — setup and finish given, the step that actually matters removed.</li>
+            <li><b>Just the principle</b> — you're told which idea applies and nothing else.</li>
+            <li><b>On your own</b> — the problem, and nothing else.</li>
+          </ul>
+          <ul>
+            <li><b>The difficulty never changes.</b> Every rung is the same kind of problem at the same level — what changes is how much of the solution you're handed. Making them harder as you go would tell you nothing about whether the method has landed.</li>
+            <li><b>Every rung is a new problem.</b> Re-showing one you've seen measures whether you remember an answer, not whether you can do the method.</li>
+            <li><b>Getting one wrong drops you back a rung</b>, on purpose. That's the feature. The top two rungs need two clean solves each, because one lucky solo problem isn't evidence of anything.</li>
+            <li><b>Looking at the solution is fine and is never punished</b> — it just doesn't tick the rung, because the ladder measures what you can do unaided.</li>
+            <li><b>If a generated problem is broken, say so.</b> "This problem looks wrong" throws it away and builds another without recording an attempt. Models get physics wrong, and you should never lose a rung for catching it.</li>
+            <li><b>If the check marks you wrong and you're right, overrule it.</b> The Disagree buttons rewind that one move and re-apply it your way.</li>
+          </ul>
+          <p>When you finish one, you can turn what it taught you into a flashcard so it gets reviewed instead of quietly decaying. While a ladder is open it becomes the suggested thing to do in that class — half a ladder teaches nothing.</p>
+          <p class="hint">This is the guidance-fading effect, and it's one of the better-replicated findings in instructional research: full worked examples beat attempting problems when a method is new, and then become actively unhelpful once it's familiar. Neither "ten worked examples" nor "ten problems, good luck" is right — earning your way down the support is.</p>
+        </section>
+
+        <section class="card help-sec" id="h-modes">
+          <h3>Study modes</h3>
+          <p class="lede">Six different kinds of study session on the Study tab of any class, all built from your own uploaded material. The app suggests one; you can pick any of them.</p>
+          <ul>
+            <li><b>Flashcards</b> — spaced retrieval on cards scheduled by FSRS. Best for facts, definitions and formulas that have to be instantly available. The only mode that tells you when to come back.</li>
+            <li><b>Worked example</b> — one problem solved all the way through, with the <em>reason</em> for every step. Read two or three of these when a procedure is new, before you try any problems.</li>
+            <li><b>Guided practice</b> — a problem you solve, with three hints you unlock one at a time and a solution behind a fold. This is the step that turns "I follow it" into "I can do it".</li>
+            <li><b>Explain it back</b> — you write the explanation from memory, and it gets graded against your material: what's right, what's wrong with the correction, and what you left out. The hardest one, and the most honest.</li>
+            <li><b>Why questions</b> — reasons and consequences instead of definitions. Use it when you can state the facts but problems still feel unfamiliar.</li>
+            <li><b>Concept map</b> — the central idea, the concepts under it, what each link actually <em>is</em>, and every equation tagged with when it holds. Good before an exam, or any time a unit feels like a pile of unrelated formulas.</li>
+            <li><b>Interleaved drill</b> — eight short problems deliberately mixed so consecutive ones need different methods. It feels worse than doing ten of the same in a row and it works better, because an exam doesn't tell you which method to use either.</li>
+          </ul>
+          <p><b>The suggestion</b> reads your real state — whether you have material, how many cards you have, whether you keep failing them, and whether an exam is close — and picks a starting mode. It follows the progression that the research actually supports: worked examples while a method is new, guided practice as it lands, and producing it yourself once it's solid. <b>Always start here</b> pins a mode for that class if you'd rather choose yourself.</p>
+          <p class="hint">Worth saying plainly: this is <em>not</em> a "learning styles" feature. The idea that people are visual or auditory learners who should be taught in their type is one of the most tested and least supported claims in education research. What does hold up is that the right technique depends on the material and on how well you already know it — which is what the modes and the suggestion are built around.</p>
+        </section>
+
+        <section class="card help-sec" id="h-study">
+          <h3>Flashcards &amp; study</h3>
+          <p class="lede">Question-and-answer cards built from your own uploaded material, scheduled so you review things right before you'd forget them.</p>
+          <ul>
+            <li><b>Generate questions</b> reads across your uploaded documents for that class and writes cards from them. It won't repeat questions already in your deck.</li>
+            <li><b>Reveal, then rate</b>: Again, Hard, Good, or Easy. Rating honestly is the whole point — the schedule adapts to what you actually find difficult. "Again" brings it back soon; "Easy" pushes it out further.</li>
+            <li><b>Manage deck</b> lists every card, not just what's due. Edit fixes a card's wording without wiping its schedule; Delete removes it.</li>
+            <li>If a generated card is <b>wrong</b>, delete it. Don't just rate it "Again" — that tells the scheduler to show you the wrong fact more often.</li>
+          </ul>
+          <p>Cards only appear when they're due. An empty review list means you're genuinely caught up, not that something's broken.</p>
+        </section>
+
+        <section class="card help-sec" id="h-chat">
+          <h3>Chat</h3>
+          <p class="lede">Open-ended questions, answered from your own uploaded material rather than from general knowledge.</p>
+          <p>Click <b>Chat</b> in the sidebar. Ask anything. The part that makes it different from a normal chatbot is <b>@</b>:</p>
+          <ul>
+            <li>Type <b>@</b> and a menu appears listing your classes and every readable document you've uploaded.</li>
+            <li>Arrow keys or the mouse to choose; Enter or Tab inserts it. The mention shows as a chip above the box.</li>
+            <li>What you picked gets resolved into actual excerpts from those files and sent with your question — and the excerpts are chosen by relevance to what you asked, so mentioning a class and asking about entropy pulls the entropy pages, not page one.</li>
+            <li>Mention a single document to keep the answer scoped to just that file.</li>
+          </ul>
+          <p><b>Sharing a file:</b> click the paperclip, or just drag a file anywhere onto the chat panel. It's read immediately and attached to your next message as a green chip. This is for things that aren't class material — a problem you're stuck on, a paper someone sent you, a job posting — so you don't have to file it under a class first. If a file has no readable text (a scanned image, usually), the app tells you plainly instead of letting you believe it was read.</p>
+          <p>A shared file <b>stays in context for the rest of that conversation</b>, so a follow-up like “and what about section 3?” still sees it without re-attaching. Class mentions deliberately don't stick — switching classes mid-conversation is something you do on purpose, and dragging the old one along would poison the answer. Shared files also show up in the <b>@</b> menu afterwards, so you can pull one back into a later conversation.</p>
+          <p>Enter sends, Shift+Enter starts a new line. Conversations are saved in the left-hand list and survive restarts; the × on a conversation deletes it. If you mention something with no readable material on file, the app says so rather than quietly answering from general knowledge.</p>
+        </section>
+
+        <section class="card help-sec" id="h-focus">
+          <h3>Focus mode</h3>
+          <p class="lede">For when you're actually sitting down to work. Everything else disappears.</p>
+          <p>Click <b>Start focus session</b> in the sidebar. The top option is the app's recommendation — it weighs what things are worth against how soon they're due, so it'll point at a heavy midterm before a cheap post that happens to be due sooner. Or pick any class yourself.</p>
+          <div class="kv"><span class="k">Review</span><span class="v">One card at a time, full screen, with a progress count and a running timer. Ends with a summary of what you got through.</span></div>
+          <div class="kv"><span class="k">Work on…</span><span class="v">One assignment: what it's worth, when it's due, a direct link into MyCourses, and a box to either have it explained to you or drafted. There's a <b>Mark this done</b> button so you can close it out without leaving.</span></div>
+          <p style="margin-top:14px">Sessions are timed and logged, and the time shows up in your daily briefing. Nothing interrupts you mid-session — the app's background refresh is suspended while you're in Focus.</p>
+        </section>
+
+        <section class="card help-sec" id="h-briefing">
+          <h3>Daily briefing</h3>
+          <p class="lede">A scan of everything — deadlines, syllabus topics, documents, review history, study time — written up once a day.</p>
+          <p>It lives at the top of <b>Overview</b> and regenerates roughly daily while the app is running, with a desktop notification when a new one is ready. <b>Refresh</b> forces one now.</p>
+          <p>It sorts by <b>grade impact first</b>, due date second. And it's built in two layers: the facts are gathered by plain code so it can't invent an assignment that doesn't exist, and the model only writes prose over those facts. With no model configured you still get the full briefing, just in plainer language.</p>
+        </section>
+
+        <section class="card help-sec" id="h-ai">
+          <h3>The AI model</h3>
+          <p class="lede">Needed for chat, question generation, summaries, drafting, and syllabus reading. Deadlines, documents, and grade maths all work without it.</p>
+          <p>Four options on the <b>Model &amp; keys</b> tab — set up as many as you like:</p>
+          <div class="kv"><span class="k">OpenAI</span><span class="v">A key from platform.openai.com, or any provider that speaks the OpenAI chat-completions API — point the Base URL at their host.</span></div>
+          <div class="kv"><span class="k">Claude</span><span class="v">A key from console.anthropic.com.</span></div>
+          <div class="kv"><span class="k">Gemini</span><span class="v">A key from aistudio.google.com.</span></div>
+          <div class="kv"><span class="k">Local (Ollama)</span><span class="v">Free and private, runs on your own machine, no key. The model dropdown lists what you actually have pulled.</span></div>
+          <p style="margin-top:14px"><b>Which one gets used</b> is the picker at the top. On <b>Automatic</b> it takes the first one with a key, in the order OpenAI → Claude → Gemini → local Ollama. Pin a specific one and it will only ever use that — and if that one isn't usable you get a clear error instead of a silent switch to a different model, which matters when you're paying for one and not the other.</p>
+          <p>Hit <b>Test connection</b> after any change — it asks the model to reply "OK" and tells you which provider and model answered, so you know it works before relying on it. The dot at the bottom of the sidebar is the same status at a glance.</p>
+          <p>Keys live only in the <code>.env</code> file in this app's folder, apply immediately with no restart, and are never shown back to you in full — only the last four characters, so you can tell which key is loaded.</p>
+        </section>
+
+        <section class="card help-sec" id="h-data">
+          <h3>Your data &amp; backup</h3>
+          <p class="lede">Everything is plain files in this app's folder on your computer. Nothing is stored anywhere else.</p>
+          <div class="kv"><span class="k">config/classes.yaml</span><span class="v">Your classes and their calendar links.</span></div>
+          <div class="kv"><span class="k">data/&lt;class&gt;/</span><span class="v">Everything for one class: <code>materials/</code> (your uploads), <code>deadlines.json</code>, <code>cards.json</code> (flashcards), <code>grading.json</code> and <code>scores.json</code>, <code>drafts/</code>, plus done/cleared lists.</span></div>
+          <div class="kv"><span class="k">data/chats.json</span><span class="v">Your saved chat conversations.</span></div>
+          <div class="kv"><span class="k">data/chat_uploads/</span><span class="v">Files you shared into a chat rather than filing under a class.</span></div>
+          <div class="kv"><span class="k">.env</span><span class="v">Your API keys and model choices.</span></div>
+          <p style="margin-top:14px">To back it up, copy the whole folder. To move to another computer, copy the folder and run <code>setup.bat</code> there. To wipe one class, delete its folder under <code>data/</code> and remove it from <code>classes.yaml</code>.</p>
+          <p>Closing the app never loses anything — every change is written to disk the moment you make it. Closing it only stops the automatic 30-minute sync until you open it again.</p>
+        </section>
+
+        <section class="card help-sec" id="h-trouble">
+          <h3>When something breaks</h3>
+          <div class="kv"><span class="k">Page won't load</span><span class="v">The app isn't running. Double-click <code>start.bat</code>, then go to <code>http://127.0.0.1:5057</code>.</span></div>
+          <div class="kv"><span class="k">"Couldn't read that calendar feed"</span><span class="v">The link isn't a feed link. It must contain <code>token=</code>. Go back to Calendar → Subscribe and copy the one in that box.</span></div>
+          <div class="kv"><span class="k">Red config banner</span><span class="v">Something's wrong in <code>config/classes.yaml</code> — the banner names the line. Usually a stray tab; YAML wants spaces.</span></div>
+          <div class="kv"><span class="k">"model not found"</span><span class="v">Ollama is running but doesn't have that model. Pick an installed one from the dropdown on Model &amp; keys, or run <code>ollama pull &lt;name&gt;</code>.</span></div>
+          <div class="kv"><span class="k">"No material on file covers…"</span><span class="v">Genuinely nothing uploaded matches that topic. Add the reading or your notes for it.</span></div>
+          <div class="kv"><span class="k">"X is selected but isn't usable"</span><span class="v">You pinned a provider on Model &amp; keys without giving it a key. Add the key, or set the picker back to Automatic.</span></div>
+          <div class="kv"><span class="k">Nothing generated</span><span class="v">Check the model dot in the sidebar, then Test connection on Model &amp; keys — that shows the real error.</span></div>
+          <div class="kv"><span class="k">Everything is broken</span><span class="v">Delete the <code>.venv</code> folder and run <code>setup.bat</code>. It rebuilds from scratch and never touches your classes, documents, or grades.</span></div>
+        </section>
+      </div>
+    </div>
+  </div>`;
+}
+
+function jumpHelp(ev, id) {
+  if (ev) ev.preventDefault();
+  const el = document.getElementById('h-' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ---------- settings ---------- */
+const PROVIDER_HELP = {
+  openai: 'OpenAI, or any provider that speaks the OpenAI chat-completions API. Change the base URL for a non-OpenAI host.',
+  anthropic: 'Claude, via the Anthropic Messages API. Get a key at console.anthropic.com.',
+  gemini: 'Google Gemini, via the Generative Language API. Get a key at aistudio.google.com.',
+};
+
+function providerCardHTML(name, p, preferred) {
+  const active = (state.settings.active_provider === name);
+  return `<section class="card">
+    <div class="card-head"><h2>${esc(p.label)}</h2>
+      ${active ? '<span class="pill-on">in use</span>' : (p.key_set ? '<span class="count">ready</span>' : '')}
+      <div class="right">${p.key_set ? `<button class="quiet" onclick="clearKey('${name}', this)">Remove key</button>` : ''}</div>
+    </div>
+    <div class="settings-note">${esc(PROVIDER_HELP[name] || '')}</div>
+    <div class="field">
+      <label>API key</label>
+      <input id="k-${name}" type="password" autocomplete="off"
+        placeholder="${p.key_set ? 'Key loaded (' + esc(p.key_hint) + ') — paste a new one to replace it' : 'paste your key'}">
+    </div>
+    <div class="field">
+      <label>Model</label>
+      <input id="m-${name}" list="dl-${name}" value="${esc(p.model || '')}">
+      <datalist id="dl-${name}">${((liveModels[name] || p.suggestions) || []).map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+      ${p.key_set && name === 'gemini' ? `<button class="quiet" style="font-size:12px;margin-top:6px"
+        onclick="fetchModels('${name}', this)">List the models my key can use</button>
+        <span id="ml-${name}" class="hint" style="display:inline-block;margin-left:8px"></span>` : ''}
+    </div>
+    ${name === 'openai' ? `<div class="field">
+      <label>Base URL <span style="text-transform:none;font-weight:500">(only for a non-OpenAI provider)</span></label>
+      <input id="u-openai" value="${esc(p.base_url || '')}" placeholder="https://api.openai.com/v1">
+    </div>` : ''}
+  </section>`;
+}
+
+function settingsHTML() {
+  const s = state.settings || {};
+  const p = s.providers || {};
+  if (!p.openai) return `<div class="page"><div class="empty"><p>Loading settings…</p></div></div>`;
+  const ollama = p.ollama || {};
+
+  return `<div class="page">
+    <div class="page-head">
+      <div class="kicker">Settings</div>
+      <h1>Model &amp; keys</h1>
+      <div class="sub">Powers chat, quizzing, summaries, drafting, and syllabus reading. Deadline sync, documents, and grade maths all work without any of this.</div>
+    </div>
+    ${settingsTabs('model')}
+
+    <section class="card">
+      <div class="card-head"><h2>Status</h2>
+        <div class="right"><button onclick="testModel(this)">Test connection</button></div></div>
+      <div class="provider-line">
+        <span class="dot" style="background:${s.active_provider === 'none' ? 'var(--warn)' : 'var(--good)'}"></span>
+        ${esc(s.active_label || 'Nothing configured')}${s.active_model ? ` <span class="muted">· ${esc(s.active_model)}</span>` : ''}
+      </div>
+      <div class="field" style="max-width:340px;margin-top:14px">
+        <label>Which one to use</label>
+        <select id="s-preferred" onchange="savePreferred(this.value)">
+          <option value="auto" ${s.preferred === 'auto' ? 'selected' : ''}>Automatic — first one with a key</option>
+          <option value="openai" ${s.preferred === 'openai' ? 'selected' : ''}>Always OpenAI</option>
+          <option value="anthropic" ${s.preferred === 'anthropic' ? 'selected' : ''}>Always Claude</option>
+          <option value="gemini" ${s.preferred === 'gemini' ? 'selected' : ''}>Always Gemini</option>
+          <option value="ollama" ${s.preferred === 'ollama' ? 'selected' : ''}>Always local (Ollama)</option>
+        </select>
+        <div class="hint">${s.preferred === 'auto'
+          ? 'Automatic order: OpenAI, then Claude, then Gemini, then local Ollama. Whichever has a key first wins.'
+          : 'Pinned. If this one is not usable you get an error rather than a silent switch to a different model.'}</div>
+      </div>
+      ${(s.configured || []).length > 1 ? `<p class="muted">Ready to use: ${(s.configured).map(c => esc((p[c] || {}).label || c)).join(', ')}</p>` : ''}
+      <div class="test-result" id="test-result"></div>
+    </section>
+
+    <div class="cardgrid">
+      ${providerCardHTML('openai', p.openai, s.preferred)}
+      ${providerCardHTML('anthropic', p.anthropic, s.preferred)}
+      ${providerCardHTML('gemini', p.gemini, s.preferred)}
+
+      <section class="card">
+        <div class="card-head"><h2>${esc(ollama.label || 'Local (Ollama)')}</h2>
+          ${state.settings.active_provider === 'ollama' ? '<span class="pill-on">in use</span>'
+            : (ollama.reachable ? '<span class="count">running</span>' : '<span class="count">not running</span>')}
+        </div>
+        <div class="settings-note">Free and private — runs on your own machine, no key. Used automatically when no cloud key is set.</div>
+        <div class="field">
+          <label>Model</label>
+          <input id="m-ollama" list="dl-ollama" value="${esc(ollama.model || '')}" placeholder="gemma4:12b">
+          <datalist id="dl-ollama">${(ollama.suggestions || []).map(m => `<option value="${esc(m)}">`).join('')}</datalist>
+          ${ollama.reachable && (ollama.suggestions || []).length && !(ollama.suggestions || []).includes(ollama.model)
+            ? `<div class="hint" style="color:var(--warn)">“${esc(ollama.model)}” isn't pulled. Installed: ${(ollama.suggestions).map(esc).join(', ')} — pick one, or run <code>ollama pull ${esc(ollama.model)}</code>.</div>`
+            : ''}
+        </div>
+        <div class="field">
+          <label>Ollama URL</label>
+          <input id="u-ollama" value="${esc(ollama.base_url || '')}" placeholder="http://localhost:11434">
+        </div>
+      </section>
+    </div>
+
+    <button class="primary" id="s-save" onclick="saveSettings()">Save settings</button>
+    <span class="muted" id="s-msg" style="margin-left:10px"></span>
+    <p class="hint" style="margin-top:14px">Keys are stored only in the <code>.env</code> file in this app's folder on your computer, and apply immediately — no restart. The app never shows a full key back to you, only its last four characters.</p>
+  </div>`;
+}
+
+async function savePreferred(value) {
+  await api('/api/settings', { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ preferred: value }) });
+  await refresh();
+}
+
+async function saveSettings() {
+  const btn = $('s-save');
+  btn.disabled = true;
+  const msg = $('s-msg');
+  if (msg) msg.textContent = '';
+  const body = {
+    openai_model: ($('m-openai') || {}).value || '',
+    anthropic_model: ($('m-anthropic') || {}).value || '',
+    gemini_model: ($('m-gemini') || {}).value || '',
+    ollama_model: ($('m-ollama') || {}).value || '',
+    openai_base_url: ($('u-openai') || {}).value || '',
+    ollama_base_url: ($('u-ollama') || {}).value || '',
+  };
+  for (const name of ['openai', 'anthropic', 'gemini']) {
+    const el = $('k-' + name);
+    if (el && el.value.trim()) body[`${name}_api_key`] = el.value.trim();
+  }
+  try {
+    await api('/api/settings', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+    await refresh();
+    const m = $('s-msg'); if (m) m.textContent = 'Saved — applies to the next request.';
+  } catch (e) {
+    const m = $('s-msg'); if (m) m.textContent = 'Failed: ' + e.message;
+  } finally {
+    const b = $('s-save'); if (b) b.disabled = false;
+  }
+}
+
+async function clearKey(name, btn) {
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = '1'; btn.textContent = 'Really remove?'; btn.classList.add('danger-armed');
+    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = 'Remove key'; btn.classList.remove('danger-armed'); } }, 3500);
+    return;
+  }
+  await api('/api/settings', { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ [`clear_${name}_key`]: true }) });
+  await refresh();
+}
+
+// Models the provider says this key can actually use. A wrong model id is
+// otherwise invisible — it fails the same way a bad key and a blocked
+// network do.
+const liveModels = {};
+
+async function fetchModels(name, btn) {
+  const out = $('ml-' + name);
+  btn.disabled = true;
+  out.style.color = 'var(--ink-dim)';
+  out.textContent = 'Asking…';
+  try {
+    const r = await api('/api/settings/models?provider=' + encodeURIComponent(name));
+    if (r.error) throw new Error(r.error);
+    liveModels[name] = r.models || [];
+    out.style.color = 'var(--good)';
+    out.textContent = `${liveModels[name].length} available — click the box to pick one.`;
+    render();
+  } catch (e) {
+    out.style.color = 'var(--danger)';
+    out.textContent = e.message;
+  } finally { btn.disabled = false; }
+}
+
+async function testModel(btn) {
+  const out = $('test-result');
+  btn.disabled = true;
+  out.style.color = 'var(--ink-dim)';
+  out.textContent = 'Checking the connection, then asking the model to say OK…';
+  try {
+    const r = await api('/api/settings/test', { method: 'POST' });
+    out.style.color = 'var(--good)';
+    out.textContent = `Working — ${r.provider}${r.model ? ' (' + r.model + ')' : ''} replied: “${r.reply}”`;
+  } catch (e) {
+    out.style.color = 'var(--danger)';
+    // The server labels WHICH of the three lookalike failures this was, so
+    // "it won't connect" can stop being one undifferentiated message.
+    const stage = (e.stage || '');
+    const lead = stage === 'network' ? 'Network: '
+      : stage === 'key' ? 'Key: '
+      : stage === 'model' ? 'Model: ' : '';
+    out.textContent = lead + e.message;
+  } finally { btn.disabled = false; }
+}
+
+/* ---------- onboarding ---------- */
+function onboardingHTML() {
+  return `<div class="page"><div class="onboard">
+    <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg></div>
+    <h1>Let's connect your first class</h1>
+    <p class="lead">Deadlines, quizzing, documents, and drafting all live inside a class. Adding one takes under a minute.</p>
+    <div class="card">
+      <ul class="steps">
+        <li><span class="n">1</span><span>In MyCourses, open <b>Calendar</b> and click <b>Subscribe</b> in the toolbar.</span></li>
+        <li><span class="n">2</span><span>Pick the course in the dropdown and copy the feed URL it shows.</span></li>
+        <li><span class="n">3</span><span>Click below, paste it in — deadlines sync immediately and every 30 minutes after.</span></li>
+      </ul>
+      <button class="primary" style="width:100%" onclick="openModal()">Add your first class</button>
+    </div>
+  </div></div>`;
+}
+
+/* ---------- actions ---------- */
+function openModal() { $('overlay').classList.add('open'); $('m-error').textContent = ''; setTimeout(() => $('m-name').focus(), 30); }
+function closeModal() { $('overlay').classList.remove('open'); }
+
+async function submitAddClass() {
+  $('m-error').textContent = '';
+  const name = $('m-name').value.trim();
+  if (!name) { $('m-error').textContent = 'Class name is required.'; return; }
+  const btn = $('m-submit');
+  btn.disabled = true; btn.textContent = 'Checking feed…';
+  try {
+    await api('/api/classes', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name,
+        term: $('m-term').value.trim(),
+        instructor: $('m-instructor').value.trim(),
+        ics_feed_url: $('m-ics').value.trim(),
+        course_filter: $('m-filter').value.trim(),
+      }) });
+    ['m-name', 'm-term', 'm-instructor', 'm-ics', 'm-filter'].forEach(id => $(id).value = '');
+    closeModal();
+    await refresh();
+  } catch (e) {
+    $('m-error').textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Add class';
+  }
+}
+
+async function syncNow() {
+  const btn = $('sync-btn');
+  btn.disabled = true; btn.textContent = 'Syncing…';
+  try { await api('/api/sync', { method: 'POST' }); await refresh(); }
+  finally { btn.disabled = false; btn.textContent = 'Sync now'; }
+}
+
+async function uploadDoc(slug, files) {
+  const list = files.length ? Array.from(files) : [files];
+  const zone = $('dz');
+  const original = zone ? zone.textContent : '';
+  try {
+    for (let i = 0; i < list.length; i++) {
+      if (zone) zone.textContent = `Uploading ${list[i].name}… (${i + 1}/${list.length})`;
+      const fd = new FormData(); fd.append('file', list[i]);
+      const resp = await fetch('/api/materials/' + slug, { method: 'POST', body: fd });
+      if (!resp.ok) {
+        const body = await resp.json().catch(() => ({}));
+        throw new Error(body.error || `upload failed (${resp.status})`);
+      }
+    }
+    await refresh();
+  } catch (e) {
+    if (zone) { zone.textContent = 'Upload failed: ' + e.message; setTimeout(() => { if (zone.isConnected) zone.textContent = original; }, 4000); }
+  }
+}
+
+async function pasteDoc(slug) {
+  $('paste-err').textContent = '';
+  const text = $('paste-text').value.trim();
+  if (!text) { $('paste-err').textContent = 'Paste some text first.'; return; }
+  try {
+    await api(`/api/materials/${slug}/paste`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ title: $('paste-title').value.trim(), text }) });
+    await refresh();
+  } catch (e) { $('paste-err').textContent = e.message; }
+}
+
+async function deleteDoc(slug, relpath, btn) {
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = '1'; btn.textContent = 'Really delete?'; btn.classList.add('danger-armed');
+    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = 'Delete'; btn.classList.remove('danger-armed'); } }, 3500);
+    return;
+  }
+  try {
+    await api(`/api/materials/${slug}/delete`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ relpath }) });
+    await refresh();
+  } catch (e) {
+    btn.textContent = 'Failed'; btn.classList.remove('danger-armed');
+  }
+}
+
+async function toggleDone(btn) {
+  const nowDone = !btn.dataset.done;
+  btn.disabled = true;
+  try {
+    await api('/api/deadlines/done', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: btn.dataset.slug, uid: btn.dataset.uid, done: nowDone }) });
+    await refresh();
+  } catch (e) { btn.disabled = false; }
+}
+
+async function deleteCard(btn) {
+  if (!btn.dataset.armed) {
+    btn.dataset.armed = '1'; btn.textContent = 'Delete?'; btn.classList.add('danger-armed');
+    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = 'Delete'; btn.classList.remove('danger-armed'); } }, 3500);
+    return;
+  }
+  btn.disabled = true;
+  try {
+    await api('/api/quiz/card', { method: 'DELETE', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: btn.dataset.slug, card_id: btn.dataset.card }) });
+    await refresh();
+  } catch (e) { btn.disabled = false; btn.textContent = 'Failed'; }
+}
+
+async function editCard(btn) {
+  const q = prompt('Question:', btn.dataset.q);
+  if (q === null) return;
+  const a = prompt('Answer:', btn.dataset.a);
+  if (a === null) return;
+  await api('/api/quiz/card', { method: 'PATCH', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ class_slug: btn.dataset.slug, card_id: btn.dataset.card, question: q, answer: a }) });
+  await refresh();
+}
+
+async function dismissDeadline(btn) {
+  btn.disabled = true;
+  try {
+    await api('/api/deadlines/dismiss', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: btn.dataset.slug, uid: btn.dataset.uid }) });
+    await refresh();
+  } catch (e) { btn.disabled = false; }
+}
+
+async function restoreDeadline(btn) {
+  btn.disabled = true;
+  try {
+    await api('/api/deadlines/restore', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: btn.dataset.slug, uid: btn.dataset.uid }) });
+    await refresh();
+  } catch (e) { btn.disabled = false; }
+}
+
+function reveal(btn) {
+  const card = btn.closest('.qcard');
+  card.querySelector('.a').style.display = 'block';
+  card.querySelector('.rate-row').style.display = 'flex';
+  btn.closest('.row').style.display = 'none';
+}
+
+async function rate(slug, cardId, rating) {
+  await api('/api/quiz/review', { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ class_slug: slug, card_id: cardId, rating }) });
+  await refresh();
+}
+
+async function generateQuestions(slug) {
+  const btn = $('gen-btn'), msg = $('gen-msg');
+  btn.disabled = true; btn.textContent = 'Generating…'; msg.style.display = 'none';
+  try {
+    const r = await api('/api/quiz/generate', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: slug }) });
+    if (r.added) { await refresh(); return; }
+    msg.textContent = r.message || 'No new questions generated.'; msg.style.display = 'block';
+  } catch (e) {
+    msg.textContent = e.message; msg.style.display = 'block';
+  } finally {
+    if (btn.isConnected) { btn.disabled = false; btn.textContent = 'Generate questions'; }
+  }
+}
+
+async function summarize(slug, btn, i) {
+  const el = $('ts-' + i);
+  el.style.display = 'block'; el.textContent = 'Reading your material…';
+  try {
+    const r = await api(`/api/getahead/${slug}/summarize`, { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ topic: btn.dataset.topic }) });
+    el.textContent = r.summary;
+  } catch (e) { el.textContent = 'Failed: ' + e.message; }
+}
+
+async function requestDraft(slug) {
+  $('draft-err').textContent = '';
+  const prompt = $('draft-prompt').value.trim();
+  if (!prompt) { $('draft-err').textContent = 'Describe what you need drafted.'; return; }
+  try {
+    const r = await api('/api/draft', { method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ class_slug: slug, assignment_slug: $('draft-slug').value.trim(), prompt }) });
+    $('draft-out').style.display = 'block';
+    $('draft-body').textContent = r.content + '\n\n— saved to ' + r.path;
+  } catch (e) { $('draft-err').textContent = e.message; }
+}
+
+/* ---------- lifecycle ---------- */
+async function refresh() { await loadAll(); render(); }
+
+window.addEventListener('hashchange', () => { showAllLater = false; render(); });
+
+refresh();
+setInterval(async () => {
+  const ae = document.activeElement;
+  const typing = ae && (ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT');
+  const view = currentRoute().view;
+  // Never re-render out from under a half-entered API key, or mid-card in a
+  // focus session — the whole point of focus mode is that nothing interrupts.
+  const protectedView = view === 'settings' || view === 'focus' || view === 'focus-pick';
+  await loadAll();
+  if (!typing && !protectedView) render(); else { renderNav(); renderStatus(); }
+}, 60000);
+</script>
+</body>
+</html>

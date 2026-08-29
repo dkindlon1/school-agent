@@ -1,0 +1,11 @@
+PyYAML>=6.0
+icalendar>=6.0
+recurring-ical-events>=3.0
+fsrs>=5.0
+pypdf>=4.0
+requests>=2.31
+Flask>=3.0
+APScheduler>=3.10
+plyer>=2.1
+python-dotenv>=1.0
+pytest>=8.0

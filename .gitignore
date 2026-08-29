@@ -1,0 +1,12 @@
+# Belt and braces. Each project carries its own .gitignore covering these
+# relative to itself; these patterns catch them at any depth, so a file can
+# never ride along just because it sat one level lower than expected.
+**/.env
+**/config/classes.yaml
+**/data/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+.DS_Store
+Thumbs.db

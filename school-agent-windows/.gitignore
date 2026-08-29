@@ -1,0 +1,14 @@
+# Your actual coursework and credentials. Never commit these.
+config/classes.yaml
+data/
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# OS cruft
+.DS_Store
+Thumbs.db
